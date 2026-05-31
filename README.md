@@ -43,45 +43,31 @@ text benchmark_tasks/     original buggy tasks src/                 benchmark an
 
 ## Running it locally
 
-## Running it locally
-
 Create the environment:
 
-```bash
-uv venv --python 3.11
-source .venv/bin/activate
-uv pip install -r requirements.txt
-```
+bash uv venv --python 3.11 source .venv/bin/activate uv pip install -r requirements.txt 
 
 Run the prompt/cache benchmark:
 
-```bash
-python -m src.runner
-```
+bash python -m src.runner 
 
 Run the test evaluator:
 
-```bash
-python -m src.test_runner
-```
+bash python -m src.test_runner 
 
-Run the repair pipeline:
+Run the repair pipeline with the rule-based baseline:
 
-```bash
-python -m src.repair_runner
-```
+bash python -m src.repair_runner --fixer rule 
+
+The runner also has a --fixer model option for future model-server experiments.
 
 Start the dashboard:
 
-```bash
-streamlit run app.py
-```
+bash streamlit run app.py 
 
 Then open:
 
-```text
-http://localhost:8501
-```
+text http://localhost:8501 
 
 ## Metrics shown
 
@@ -99,7 +85,7 @@ TTFT means time to first token. In the current version, latency and TTFT are sti
 
 ## Next steps
 
-- Add a real OpenAI-compatible backend.
+- Add a real model-server backend.
 - Add support for local vLLM / SGLang endpoints.
 - Add more realistic code-repair tasks.
 - Track pass rate, retries, TTFT, latency, and throughput together.
