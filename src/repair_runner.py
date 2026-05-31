@@ -3,9 +3,10 @@ import json
 import re
 import subprocess
 import time
+import argparse
 from pathlib import Path
 
-from src.agent_backend import RuleFixer, read_task_text
+from src.agent_backend import ModelServerFixer, RuleFixer, read_task_text
 from src.workspace import reset_run_workspace
 
 
@@ -49,7 +50,14 @@ def run_pytest(task_dir: Path) -> dict:
         "runtime_seconds": round(elapsed, 4),
     }
 
+def pick_fixer(name: str):
+    if name == "rule":
+        return RuleFixer()
 
+    if name == "model":
+        return ModelServerFixer()
+
+    raise ValueError(f"Unknown fixer: {name}")
 def write_trace(trace: dict) -> None:
     TRACE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
@@ -62,9 +70,16 @@ def main() -> None:
 
     if TRACE_PATH.exists():
         TRACE_PATH.unlink()
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+    "--fixer",
+    choices=["rule", "model"],
+    default="rule",
+    help="which fixer backend to use",
+)
+    args = parser.parse_args()
     run_dir = reset_run_workspace()
-    fixer = RuleFixer()
+    fixer = pick_fixer(args.fixer)
 
     task_dirs = sorted(
         path for path in run_dir.iterdir()
