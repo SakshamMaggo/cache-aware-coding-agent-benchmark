@@ -1,0 +1,1 @@
+Fix the palindrome checker. It should ignore capitalization.

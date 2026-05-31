@@ -1,0 +1,4 @@
+task_id,before_passed,before_tests_passed,before_tests_failed,after_passed,after_tests_passed,after_tests_failed,after_total_tests,repair_runtime_seconds,fixer
+task_001,False,0,3,True,3,0,3,0.1065,rule_baseline
+task_002,False,2,1,True,3,0,3,0.1064,rule_baseline
+task_003,False,2,1,True,3,0,3,0.106,rule_baseline
