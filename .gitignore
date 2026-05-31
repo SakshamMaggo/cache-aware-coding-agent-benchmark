@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Virtual environment
+.venv/
+
+# Generated run folders
+runs/
+
+# Generated result files
+results/*.csv
+results/*.jsonl
+
+# System files
+.DS_Store
