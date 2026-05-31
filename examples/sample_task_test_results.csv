@@ -1,4 +1,7 @@
 task_id,passed,tests_passed,tests_failed,total_tests,runtime_seconds,short_failure
-task_001,False,0,3,3,0.1997,FAILED test_buggy_code.py::test_add_positive_numbers - assert -1 == 5 ; FAILED test_buggy_code.py::test_add_negative_numbers - assert 1 == -5 ; FAILED test_buggy_code.py::test_add_zero - assert -7 == 7
-task_002,False,2,1,3,0.1229,FAILED test_buggy_code.py::test_factorial_five - assert 24 == 120
-task_003,False,2,1,3,0.123,FAILED test_buggy_code.py::test_capitalized_palindrome - AssertionError: asse...
+task_001,False,0,3,3,0.189,FAILED test_buggy_code.py::test_add_positive_numbers - assert -1 == 5 ; FAILED test_buggy_code.py::test_add_negative_numbers - assert 1 == -5 ; FAILED test_buggy_code.py::test_add_zero - assert -7 == 7
+task_002,False,2,1,3,0.1155,FAILED test_buggy_code.py::test_factorial_five - assert 24 == 120
+task_003,False,2,1,3,0.1159,FAILED test_buggy_code.py::test_capitalized_palindrome - AssertionError: asse...
+task_004,False,1,2,3,0.1167,FAILED test_buggy_code.py::test_empty_string - AssertionError: assert 1 == 0 ; FAILED test_buggy_code.py::test_multiple_spaces - AssertionError: assert 4 == 2
+task_005,False,1,2,3,0.1165,FAILED test_buggy_code.py::test_negative_numbers - assert 0 == -2 ; FAILED test_buggy_code.py::test_single_number - assert 0 == -7
+task_006,False,2,1,3,0.1153,FAILED test_buggy_code.py::test_average_empty_list - ZeroDivisionError: divis...
