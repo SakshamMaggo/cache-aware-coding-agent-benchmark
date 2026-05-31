@@ -1,0 +1,1 @@
+Fix the word counter. It should handle empty strings and multiple spaces correctly.

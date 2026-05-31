@@ -1,0 +1,1 @@
+Fix the average function. It should return 0 for an empty list instead of crashing.

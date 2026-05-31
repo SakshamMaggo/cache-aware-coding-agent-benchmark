@@ -1,0 +1,1 @@
+Fix the max finder. It should work correctly when all numbers are negative.
