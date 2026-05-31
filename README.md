@@ -43,29 +43,45 @@ text benchmark_tasks/     original buggy tasks src/                 benchmark an
 
 ## Running it locally
 
+## Running it locally
+
 Create the environment:
 
-bash uv venv --python 3.11 source .venv/bin/activate uv pip install -r requirements.txt 
+```bash
+uv venv --python 3.11
+source .venv/bin/activate
+uv pip install -r requirements.txt
+```
 
 Run the prompt/cache benchmark:
 
-bash python -m src.runner 
+```bash
+python -m src.runner
+```
 
 Run the test evaluator:
 
-bash python -m src.test_runner 
+```bash
+python -m src.test_runner
+```
 
 Run the repair pipeline:
 
-bash python -m src.repair_runner 
+```bash
+python -m src.repair_runner
+```
 
 Start the dashboard:
 
-bash streamlit run app.py 
+```bash
+streamlit run app.py
+```
 
 Then open:
 
-text http://localhost:8501 
+```text
+http://localhost:8501
+```
 
 ## Metrics shown
 
