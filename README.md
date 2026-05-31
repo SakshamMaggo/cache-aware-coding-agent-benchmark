@@ -83,6 +83,16 @@ Then open:
 
     http://localhost:8501
 
+## Sample outputs
+
+The `examples/` folder contains a few sample outputs from the current prototype:
+
+    examples/sample_task_test_results.csv
+    examples/sample_repair_results.csv
+    examples/sample_repair_traces.jsonl
+
+The actual `results/` folder is ignored by git because it gets regenerated every time the benchmark is run locally.
+
 ## Metrics shown
 
 Current metrics include:
