@@ -10,7 +10,7 @@ Right now, this repo is not trying to claim a final result. It is a working prot
 
 - Builds normal and cache-aware prompts for small code-repair tasks.
 - Measures prompt tokens and prefix reuse.
-- Runs a small set of buggy Python tasks with pytest.
+- Runs a small set of buggy Python tasks with `pytest`.
 - Applies a simple baseline fixer.
 - Re-runs tests after repair.
 - Saves before/after repair traces.
@@ -33,41 +33,55 @@ The current version is just the first step toward that.
 
 ## Current pipeline
 
-text benchmark task -> build prompt -> measure prefix reuse -> run tests -> apply baseline fix -> run tests again -> save results -> show dashboard 
+    benchmark task
+    -> build prompt
+    -> measure prefix reuse
+    -> run tests
+    -> apply baseline fix
+    -> run tests again
+    -> save results
+    -> show dashboard
 
-The repair runner uses a temporary workspace under runs/current_run, so the original buggy tasks stay unchanged.
+The repair runner uses a temporary workspace under `runs/current_run`, so the original buggy tasks stay unchanged.
 
 ## Project structure
 
-text benchmark_tasks/     original buggy tasks src/                 benchmark and repair code runs/                temporary working copies, ignored by git results/             generated outputs, ignored by git app.py               Streamlit dashboard requirements.txt     Python dependencies 
+    benchmark_tasks/     original buggy tasks
+    src/                 benchmark and repair code
+    runs/                temporary working copies, ignored by git
+    results/             generated outputs, ignored by git
+    app.py               Streamlit dashboard
+    requirements.txt     Python dependencies
 
 ## Running it locally
 
 Create the environment:
 
-bash uv venv --python 3.11 source .venv/bin/activate uv pip install -r requirements.txt 
+    uv venv --python 3.11
+    source .venv/bin/activate
+    uv pip install -r requirements.txt
 
 Run the prompt/cache benchmark:
 
-bash python -m src.runner 
+    python -m src.runner
 
 Run the test evaluator:
 
-bash python -m src.test_runner 
+    python -m src.test_runner
 
 Run the repair pipeline with the rule-based baseline:
 
-bash python -m src.repair_runner --fixer rule 
+    python -m src.repair_runner --fixer rule
 
-The runner also has a --fixer model option for future model-server experiments.
+The runner also has a `--fixer model` option for future model-server experiments.
 
 Start the dashboard:
 
-bash streamlit run app.py 
+    streamlit run app.py
 
 Then open:
 
-text http://localhost:8501 
+    http://localhost:8501
 
 ## Metrics shown
 
