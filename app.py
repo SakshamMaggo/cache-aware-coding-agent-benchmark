@@ -271,29 +271,48 @@ if repair_results_path.exists():
     c3.metric("Repair rate", f"{repair_rate:.0%}")
     c4.metric("Failed tests", f"{before_failed} → {after_failed}")
 
-    clean_repair_df = repair_df.rename(
-        columns={
-            "task_id": "Task",
-            "before_passed": "Passed before",
-            "before_tests_passed": "Tests passed before",
-            "before_tests_failed": "Tests failed before",
-            "after_passed": "Passed after",
-            "after_tests_passed": "Tests passed after",
-            "after_tests_failed": "Tests failed after",
-            "after_total_tests": "Total tests after",
-            "repair_runtime_seconds": "Repair runtime, seconds",
-            "fixer": "Fixer",
-        }
-    )
+repair_columns = [
+    "task_id",
+    "fixer",
+    "model",
+    "model_latency_seconds",
+    "prompt_chars",
+    "output_chars",
+    "before_passed",
+    "before_tests_failed",
+    "after_passed",
+    "after_tests_failed",
+    "repair_runtime_seconds",
+]
 
-    st.dataframe(clean_repair_df, use_container_width=True, hide_index=True)
+available_repair_columns = [
+    col for col in repair_columns if col in repair_df.columns
+]
 
-    st.caption(
+clean_repair_df = repair_df[available_repair_columns].rename(
+    columns={
+        "task_id": "Task",
+        "fixer": "Fixer",
+        "model": "Model",
+        "model_latency_seconds": "Fix call time, seconds",
+        "prompt_chars": "Prompt chars",
+        "output_chars": "Output chars",
+        "before_passed": "Passed before",
+        "before_tests_failed": "Failed tests before",
+        "after_passed": "Passed after",
+        "after_tests_failed": "Failed tests after",
+        "repair_runtime_seconds": "Pytest time after repair",
+    }
+)
+
+st.dataframe(clean_repair_df, use_container_width=True, hide_index=True)
+
+st.caption(
         "This first repair run uses a small rule-based fixer. It is only a baseline to test the repair loop. Later, this gets replaced by a real LLM/coding-agent backend."
     )
-    trace_path = Path("results/repair_traces.jsonl")
+trace_path = Path("results/repair_traces.jsonl")
 
-    if trace_path.exists():
+if trace_path.exists():
         st.markdown("#### Repair traces")
 
         traces = []
