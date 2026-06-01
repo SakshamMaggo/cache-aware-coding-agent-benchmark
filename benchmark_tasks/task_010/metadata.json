@@ -1,0 +1,5 @@
+{
+  "repo_group": "trace_utils",
+  "bug_type": "retry_trace_aggregation",
+  "difficulty": "medium"
+}
