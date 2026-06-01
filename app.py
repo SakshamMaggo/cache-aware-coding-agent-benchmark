@@ -39,6 +39,7 @@ Latency and TTFT are simulated for now.
 
 results_path = Path("results/dummy_cache_benchmark_results.csv")
 experiment_results_path = Path("results/experiment_results.csv")
+backend_compare_path = Path("results/backend_comparison.csv")
 if not results_path.exists():
     st.warning("No results found yet. Run `python -m src.runner` first.")
     st.stop()
@@ -340,6 +341,65 @@ else:
     st.info("No task test results found yet. Run `python -m src.test_runner` first.")
 st.divider()
 
+st.subheader("Backend comparison")
+
+if backend_compare_path.exists():
+    backend_df = pd.read_csv(backend_compare_path)
+
+    c1, c2, c3 = st.columns(3)
+
+    none_rate = backend_df.loc[
+        backend_df["backend_run"] == "none", "pass_rate"
+    ].iloc[0]
+
+    rule_rate = backend_df.loc[
+        backend_df["backend_run"] == "rule", "pass_rate"
+    ].iloc[0]
+
+    failed_after_rule = backend_df.loc[
+        backend_df["backend_run"] == "rule", "failed_tests_after"
+    ].iloc[0]
+
+    c1.metric("No-fix pass rate", f"{none_rate:.0%}")
+    c2.metric("Rule baseline pass rate", f"{rule_rate:.0%}")
+    c3.metric("Failed tests after rule", int(failed_after_rule))
+
+    fig_backend = px.bar(
+        backend_df,
+        x="pass_rate",
+        y="backend_run",
+        orientation="h",
+        text=backend_df["pass_rate"].map(lambda x: f"{x:.0%}"),
+        labels={"pass_rate": "pass rate", "backend_run": "backend"},
+        title="Baseline comparison",
+    )
+    fig_backend.update_traces(textposition="outside")
+    fig_backend.update_layout(
+        height=260,
+        showlegend=False,
+        xaxis_range=[0, 1],
+        margin=dict(l=20, r=40, t=50, b=20),
+    )
+    st.plotly_chart(fig_backend, use_container_width=True)
+
+    show_backend_df = backend_df.rename(
+        columns={
+            "backend_run": "Backend",
+            "tasks": "Tasks",
+            "pass_rate": "Pass rate",
+            "avg_attempts": "Avg attempts",
+            "failed_tests_after": "Failed tests after",
+            "total_fix_call_ms": "Total fix time, ms",
+        }
+    )
+
+    st.dataframe(show_backend_df, use_container_width=True, hide_index=True)
+
+    st.caption(
+        "The no-fix run is a negative control. It should fail. The rule baseline checks that the repair/evaluation loop can turn the same failing tasks into passing ones."
+    )
+else:
+    st.info("No backend comparison found yet. Run `python -m src.backend_compare` first.")
 st.subheader("Repair run")
 
 repair_results_path = Path("results/repair_results.csv")
