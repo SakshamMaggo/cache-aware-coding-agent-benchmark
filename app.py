@@ -245,7 +245,7 @@ if test_results_path.exists():
     st.dataframe(clean_test_df, use_container_width=True, hide_index=True)
 
     st.caption(
-        "These are intentionally failing tasks for now. The next version will add a fixing agent and measure whether it can turn these failures into passing tests."
+    "These are the original buggy tasks. The repair section below shows whether the fixer can turn them into passing tasks."
     )
 else:
     st.info("No task test results found yet. Run `python -m src.test_runner` first.")
