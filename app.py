@@ -41,6 +41,7 @@ results_path = Path("results/dummy_cache_benchmark_results.csv")
 experiment_results_path = Path("results/experiment_results.csv")
 backend_compare_path = Path("results/backend_comparison.csv")
 attempt_results_path = Path("results/attempt_results.csv")
+model_experiment_path = Path("examples/sample_model_experiment_results.csv")
 if not results_path.exists():
     st.warning("No results found yet. Run `python -m src.runner` first.")
     st.stop()
@@ -294,6 +295,76 @@ if experiment_results_path.exists():
     )
 else:
     st.info("No experiment results found yet. Run `python -m src.experiment_runner` first.")
+st.divider()
+
+st.subheader("Model prompt experiment sample")
+
+if model_experiment_path.exists():
+    model_exp_df = pd.read_csv(model_experiment_path)
+
+    model_summary = (
+        model_exp_df.groupby("experiment")
+        .agg(
+            tasks=("task_id", "count"),
+            pass_rate=("after_passed", "mean"),
+            recent_reuse=("recent_prefix_reuse", "mean"),
+            best_reuse=("best_prefix_reuse", "mean"),
+            avg_latency=("model_latency_seconds", "mean"),
+        )
+        .reset_index()
+    )
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Model runs", len(model_summary))
+    c2.metric("Tasks per run", int(model_summary["tasks"].max()))
+    c3.metric("Best recent reuse", f"{model_summary['recent_reuse'].max():.3f}")
+
+    fig_model_exp = px.bar(
+        model_summary,
+        x="experiment",
+        y="recent_reuse",
+        text=model_summary["recent_reuse"].map(lambda x: f"{x:.3f}"),
+        title="Recent prefix reuse with model backend",
+        labels={
+            "experiment": "run",
+            "recent_reuse": "recent prefix reuse",
+        },
+    )
+    fig_model_exp.update_traces(
+        textposition="outside",
+        width=0.45,
+    )
+    fig_model_exp.update_layout(
+        height=300,
+        showlegend=False,
+        bargap=0.45,
+        margin=dict(l=30, r=30, t=45, b=70),
+    )
+
+    left, middle, right = st.columns([1, 4, 1])
+
+    with middle:
+        st.plotly_chart(fig_model_exp, use_container_width=True)
+
+    show_model_summary = model_summary.rename(
+        columns={
+            "experiment": "Run",
+            "tasks": "Tasks",
+            "pass_rate": "Pass rate",
+            "recent_reuse": "Recent reuse",
+            "best_reuse": "Best reuse",
+            "avg_latency": "Avg model call time",
+        }
+    )
+
+    st.dataframe(show_model_summary, use_container_width=True, hide_index=True)
+
+    st.caption(
+        "This is a saved model-backed sample from examples/. It is not run in CI because it needs a private API key."
+    )
+else:
+    st.info("No model prompt experiment sample found yet.")
+
 st.subheader("Code task test results")
 
 test_results_path = Path("results/task_test_results.csv")
