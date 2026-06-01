@@ -139,6 +139,12 @@ For a short summary of the latest local run, see:
 
     docs/latest_run.md
 
+For the current task inventory, see:
+
+    docs/tasks.md
+
+This lists each benchmark task with its repo group, bug type, difficulty, and short description.
+
 ## Metrics shown
 
 Current metrics include:
