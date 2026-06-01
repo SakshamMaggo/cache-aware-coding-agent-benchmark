@@ -1,0 +1,2 @@
+task_id,fixer,attempt,passed,tests_passed,tests_failed,model,model_latency_seconds,prompt_chars,output_chars
+task_001,model_server,1,True,3,0,gpt-4.1-mini,2.94909883,250,40
