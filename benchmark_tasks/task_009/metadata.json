@@ -1,0 +1,5 @@
+{
+  "repo_group": "cache_utils",
+  "bug_type": "cache_key_normalization",
+  "difficulty": "medium"
+}
