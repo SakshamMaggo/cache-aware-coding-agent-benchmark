@@ -7,6 +7,7 @@ COMMANDS = [
     ["python", "-m", "src.trace_analyzer"],
     ["python", "-m", "src.experiment_runner"],
     ["python", "-m", "src.backend_compare"],
+    ["python", "-m", "src.make_tasks_doc"],
     ["python", "-m", "src.make_report"],
 ]
 
