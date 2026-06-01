@@ -40,6 +40,7 @@ Latency and TTFT are simulated for now.
 results_path = Path("results/dummy_cache_benchmark_results.csv")
 experiment_results_path = Path("results/experiment_results.csv")
 backend_compare_path = Path("results/backend_comparison.csv")
+attempt_results_path = Path("results/attempt_results.csv")
 if not results_path.exists():
     st.warning("No results found yet. Run `python -m src.runner` first.")
     st.stop()
@@ -400,6 +401,44 @@ if backend_compare_path.exists():
     )
 else:
     st.info("No backend comparison found yet. Run `python -m src.backend_compare` first.")
+st.divider()
+
+st.subheader("Attempt-level repair trace")
+
+if attempt_results_path.exists():
+    attempt_df = pd.read_csv(attempt_results_path)
+
+    total_attempts = len(attempt_df)
+    passed_attempts = int(attempt_df["passed"].sum())
+    failed_attempts = total_attempts - passed_attempts
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Logged attempts", total_attempts)
+    c2.metric("Passed attempts", passed_attempts)
+    c3.metric("Failed attempts", failed_attempts)
+
+    show_attempts = attempt_df.rename(
+        columns={
+            "task_id": "Task",
+            "fixer": "Fixer",
+            "attempt": "Attempt",
+            "passed": "Passed",
+            "tests_passed": "Tests passed",
+            "tests_failed": "Tests failed",
+            "model": "Model",
+            "model_latency_seconds": "Call time, seconds",
+            "prompt_chars": "Prompt chars",
+            "output_chars": "Output chars",
+        }
+    )
+
+    st.dataframe(show_attempts, use_container_width=True, hide_index=True)
+
+    st.caption(
+        "This table is more useful once model backends are used. It keeps one row per repair attempt, so retries and failed attempts can be inspected directly."
+    )
+else:
+    st.info("No attempt-level results found yet. Run `python -m src.trace_analyzer` first.")
 st.subheader("Repair run")
 
 repair_results_path = Path("results/repair_results.csv")
