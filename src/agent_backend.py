@@ -61,7 +61,7 @@ class ModelServerFixer(BaseFixer):
                 "Install requirements first."
             ) from exc
 
-        self.model = os.getenv("MODEL_NAME", "gpt-4.1-mini")
+        self.model = os.getenv("MODEL_NAME", "local-code-model")
         api_key = os.getenv("MODEL_API_KEY") or os.getenv("OPENAI_API_KEY")
         base_url = os.getenv("MODEL_BASE_URL") or os.getenv("OPENAI_BASE_URL") or None
 
