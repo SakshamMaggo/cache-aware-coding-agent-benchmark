@@ -1,5 +1,6 @@
 import os
 import time
+from src.env_loader import load_env
 from pathlib import Path
 
 from src.fixer import generate_rule_based_fix
@@ -63,7 +64,7 @@ class ModelServerFixer(BaseFixer):
 
     def __init__(self) -> None:
         super().__init__()
-
+        load_env()
         try:
             from openai import OpenAI
         except ImportError as exc:
