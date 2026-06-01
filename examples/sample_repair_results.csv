@@ -1,7 +1,7 @@
-task_id,before_passed,before_tests_passed,before_tests_failed,after_passed,after_tests_passed,after_tests_failed,after_total_tests,repair_runtime_seconds,fixer,model,model_latency_seconds,prompt_chars,output_chars
-task_001,False,0,3,True,3,0,3,0.108,rule_baseline,rule_based,0.0,110,40
-task_002,False,2,1,True,3,0,3,0.1098,rule_baseline,rule_based,0.0,179,101
-task_003,False,2,1,True,3,0,3,0.1095,rule_baseline,rule_based,0.0,114,79
-task_004,False,1,2,True,3,0,3,0.1091,rule_baseline,rule_based,0.0,137,52
-task_005,False,1,2,True,3,0,3,0.1081,rule_baseline,rule_based,0.0,196,128
-task_006,False,2,1,True,3,0,3,0.1082,rule_baseline,rule_based,0.0,134,86
+task_id,before_passed,before_tests_passed,before_tests_failed,after_passed,after_tests_passed,after_tests_failed,after_total_tests,repair_runtime_seconds,fixer,model,attempts_used,max_attempts,total_fix_call_ms,model_latency_seconds,prompt_chars,output_chars
+task_001,False,0,3,True,3,0,3,0.1086,rule_baseline,rule_based,1,2,0.0015,1.5e-06,110,40
+task_002,False,2,1,True,3,0,3,0.1083,rule_baseline,rule_based,1,2,0.0015,1.5e-06,179,101
+task_003,False,2,1,True,3,0,3,0.1133,rule_baseline,rule_based,1,2,0.0015,1.5e-06,114,79
+task_004,False,1,2,True,3,0,3,0.1084,rule_baseline,rule_based,1,2,0.0024,2.42e-06,137,52
+task_005,False,1,2,True,3,0,3,0.1089,rule_baseline,rule_based,1,2,0.0013,1.29e-06,196,128
+task_006,False,2,1,True,3,0,3,0.1091,rule_baseline,rule_based,1,2,0.0023,2.25e-06,134,86
