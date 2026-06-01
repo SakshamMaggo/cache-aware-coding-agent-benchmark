@@ -210,6 +210,8 @@ def run_one_experiment(
                 "experiment": experiment_name,
                 "task_id": task_dir.name,
                 "repo_group": repo_group(task_dir),
+                "bug_type": read_task_meta(task_dir).get("bug_type", "unknown"),
+                "difficulty": read_task_meta(task_dir).get("difficulty", "unknown"),
                 "position": position,
                 "prompt_mode": prompt_mode,
                 "order_mode": order_mode,

@@ -1,3 +1,5 @@
 {
-  "repo_group": "string_utils"
+  "repo_group": "string_utils",
+  "bug_type": "case_normalization",
+  "difficulty": "easy"
 }
