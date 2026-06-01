@@ -173,9 +173,11 @@ def main() -> None:
         for path in run_dir.iterdir()
         if path.is_dir() and path.name.startswith(("task_", "tsk_"))
     )
+
     if args.max_tasks is not None:
         task_dirs = task_dirs[: args.max_tasks]
-        rows = []
+
+    rows = []
 
     for task_dir in task_dirs:
         print(f"Repairing {task_dir.name}...")
@@ -225,6 +227,9 @@ def main() -> None:
                 "output_chars": result["last_output_chars"],
             }
         )
+
+    if not rows:
+        raise ValueError("No repair tasks found.")
 
     with open(OUTPUT_PATH, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
