@@ -62,10 +62,18 @@ class ModelServerFixer(BaseFixer):
             ) from exc
 
         self.model = os.getenv("MODEL_NAME", "gpt-4.1-mini")
+        api_key = os.getenv("MODEL_API_KEY") or os.getenv("OPENAI_API_KEY")
+        base_url = os.getenv("MODEL_BASE_URL") or os.getenv("OPENAI_BASE_URL") or None
+
+        if not api_key:
+         raise ValueError(
+        "No model API key found. Set MODEL_API_KEY in your local .env file first."
+    )
+
         self.client = OpenAI(
-            api_key=os.getenv("MODEL_API_KEY") or os.getenv("OPENAI_API_KEY"),
-            base_url=os.getenv("MODEL_BASE_URL") or os.getenv("OPENAI_BASE_URL") or None,
-        )
+    api_key=api_key,
+    base_url=base_url,
+)
 
     def fix(self, task_id: str, task_text: str, buggy_code: str) -> str:
         prompt = (
