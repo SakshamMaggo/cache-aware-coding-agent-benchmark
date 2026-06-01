@@ -38,6 +38,27 @@ The current fixer is rule-based, so the fixer latency is not meaningful as model
 
 The task set is also small and toy-like. The next useful step is to run the same experiment through a real model-server backend, and later through vLLM or SGLang.
 
+## Model backend check
+
+I also ran the model-server backend once on the current 6-task set using a hosted model endpoint.
+
+This is not a full benchmark result yet, but it confirms that the `--fixer model` path is actually wired up and can produce real repair outputs.
+
+In the sample run:
+
+- all 6 tasks were attempted with `model_server`
+- the run logged real model latency
+- prompt size and output size were saved
+- attempt-level traces were written
+
+The sample files are saved separately under `examples/`:
+
+- `sample_model_repair_results.csv`
+- `sample_model_attempt_results.csv`
+- `sample_model_repair_traces.jsonl`
+
+I am still treating the rule baseline as the default reproducible run because GitHub Actions should not depend on a private API key.
+
 ## Next result to aim for
 
 The next meaningful result should compare:
