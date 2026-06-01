@@ -1,7 +1,9 @@
 task_id,before_passed,before_tests_passed,before_tests_failed,after_passed,after_tests_passed,after_tests_failed,after_total_tests,repair_runtime_seconds,fixer,model,attempts_used,max_attempts,total_fix_call_ms,model_latency_seconds,prompt_chars,output_chars
-task_001,False,0,3,True,3,0,3,0.151,model_server,gpt-4.1-mini,1,1,1593.1509,1.59315092,250,40
-task_002,False,2,1,True,3,0,3,0.152,model_server,gpt-4.1-mini,1,1,2418.967,2.41896704,319,101
-task_003,False,2,1,True,3,0,3,0.147,model_server,gpt-4.1-mini,1,1,2018.7537,2.01875371,254,79
-task_004,False,1,2,True,3,0,3,0.1503,model_server,gpt-4.1-mini,1,1,1082.0666,1.08206658,277,75
-task_005,False,1,2,True,3,0,3,0.144,model_server,gpt-4.1-mini,1,1,1436.3742,1.43637421,336,128
-task_006,False,2,1,True,3,0,3,0.1435,model_server,gpt-4.1-mini,1,1,1000.875,1.000875,274,67
+task_001,False,0,3,True,3,0,3,0.1431,model_server,gpt-4.1-mini,1,1,2094.1174,2.09411742,250,40
+task_002,False,2,1,True,3,0,3,0.1418,model_server,gpt-4.1-mini,1,1,1359.4206,1.35942058,319,101
+task_003,False,2,1,True,3,0,3,0.1418,model_server,gpt-4.1-mini,1,1,1989.6031,1.98960308,254,79
+task_004,False,1,2,True,3,0,3,0.1446,model_server,gpt-4.1-mini,1,1,1067.6795,1.0676795,277,75
+task_005,False,1,2,True,3,0,3,0.1439,model_server,gpt-4.1-mini,1,1,2399.6106,2.39961062,336,128
+task_006,False,2,1,True,3,0,3,0.1477,model_server,gpt-4.1-mini,1,1,3047.4231,3.04742313,274,67
+task_007,False,1,2,True,3,0,3,0.1461,model_server,gpt-4.1-mini,1,1,1337.43,1.33742996,473,217
+task_008,False,1,2,True,3,0,3,0.1392,model_server,gpt-4.1-mini,1,1,1063.2495,1.0632495,416,162

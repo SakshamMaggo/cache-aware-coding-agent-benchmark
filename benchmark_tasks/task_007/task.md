@@ -1,0 +1,1 @@
+Fix the file filter. It should return Python files from a list of paths and should handle `.py` extensions case-insensitively.

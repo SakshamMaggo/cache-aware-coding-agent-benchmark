@@ -1,0 +1,1 @@
+Fix the count merger. It should combine two count dictionaries by adding counts for existing keys. It should not mutate the input dictionaries.

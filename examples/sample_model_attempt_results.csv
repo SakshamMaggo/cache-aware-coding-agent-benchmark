@@ -1,7 +1,9 @@
 task_id,fixer,attempt,passed,tests_passed,tests_failed,model,model_latency_seconds,prompt_chars,output_chars
-task_001,model_server,1,True,3,0,gpt-4.1-mini,1.59315092,250,40
-task_002,model_server,1,True,3,0,gpt-4.1-mini,2.41896704,319,101
-task_003,model_server,1,True,3,0,gpt-4.1-mini,2.01875371,254,79
-task_004,model_server,1,True,3,0,gpt-4.1-mini,1.08206658,277,75
-task_005,model_server,1,True,3,0,gpt-4.1-mini,1.43637421,336,128
-task_006,model_server,1,True,3,0,gpt-4.1-mini,1.000875,274,67
+task_001,model_server,1,True,3,0,gpt-4.1-mini,2.09411742,250,40
+task_002,model_server,1,True,3,0,gpt-4.1-mini,1.35942058,319,101
+task_003,model_server,1,True,3,0,gpt-4.1-mini,1.98960308,254,79
+task_004,model_server,1,True,3,0,gpt-4.1-mini,1.0676795,277,75
+task_005,model_server,1,True,3,0,gpt-4.1-mini,2.39961062,336,128
+task_006,model_server,1,True,3,0,gpt-4.1-mini,3.04742313,274,67
+task_007,model_server,1,True,3,0,gpt-4.1-mini,1.33742996,473,217
+task_008,model_server,1,True,3,0,gpt-4.1-mini,1.0632495,416,162
