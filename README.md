@@ -104,8 +104,12 @@ Current metrics include:
 - unit-test pass/fail
 - repair success rate
 - before/after code traces
+- fixer backend used
+- model/backend name
+- fixer call latency
+- prompt/output character counts
 
-TTFT means time to first token. In the current version, latency and TTFT are still simulated because the model backend is not real yet.
+TTFT means time to first token. In the current prompt/cache benchmark, latency and TTFT are still simulated. In the repair pipeline, the fixer call time is now logged separately so real model-server runs can be compared later.
 
 ## Next steps
 
