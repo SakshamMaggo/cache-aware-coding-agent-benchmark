@@ -1,0 +1,12 @@
+{
+  "backends": [
+    {
+      "name": "none",
+      "max_attempts": 2
+    },
+    {
+      "name": "rule",
+      "max_attempts": 2
+    }
+  ]
+}

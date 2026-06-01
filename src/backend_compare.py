@@ -1,20 +1,29 @@
 import csv
+import json
 import subprocess
 from pathlib import Path
 
 import pandas as pd
 
 
+CONFIG_PATH = Path("configs/backends.json")
 OUTPUT_PATH = Path("results/backend_comparison.csv")
 
 
-def run_backend(fixer: str, max_attempts: int = 2) -> pd.DataFrame:
+def load_backends() -> list[dict]:
+    with open(CONFIG_PATH, "r") as f:
+        config = json.load(f)
+
+    return config["backends"]
+
+
+def run_backend(name: str, max_attempts: int) -> pd.DataFrame:
     cmd = [
         "python",
         "-m",
         "src.repair_runner",
         "--fixer",
-        fixer,
+        name,
         "--max-attempts",
         str(max_attempts),
     ]
@@ -22,7 +31,7 @@ def run_backend(fixer: str, max_attempts: int = 2) -> pd.DataFrame:
     subprocess.run(cmd, check=True)
 
     df = pd.read_csv("results/repair_results.csv")
-    df["backend_run"] = fixer
+    df["backend_run"] = name
     return df
 
 
@@ -31,9 +40,12 @@ def main() -> None:
 
     runs = []
 
-    for fixer in ["none", "rule"]:
-        print(f"Running backend: {fixer}")
-        runs.append(run_backend(fixer))
+    for backend in load_backends():
+        name = backend["name"]
+        max_attempts = backend.get("max_attempts", 2)
+
+        print(f"Running backend: {name}")
+        runs.append(run_backend(name, max_attempts))
 
     combined = pd.concat(runs, ignore_index=True)
 
