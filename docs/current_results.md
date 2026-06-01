@@ -59,6 +59,21 @@ The sample files are saved separately under `examples/`:
 
 I am still treating the rule baseline as the default reproducible run because GitHub Actions should not depend on a private API key.
 
+I also ran a small model-based prompt-layout experiment with `--fixer model --max-tasks 2`.
+
+This produced a real model-backed experiment CSV with four prompt settings:
+
+- normal prompt layout
+- cache-aware prompt layout
+- grouped cache-aware prompt layout
+- grouped cache-aware prompt layout without repo context
+
+The sample file is saved as:
+
+- `examples/sample_model_experiment_results.csv`
+
+This is still a small sample, but it confirms that the prompt-layout experiment can run through the same model-server backend, not only through the rule baseline.
+
 ## Next result to aim for
 
 The next meaningful result should compare:
