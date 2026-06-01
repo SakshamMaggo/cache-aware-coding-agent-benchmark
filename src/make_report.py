@@ -9,6 +9,9 @@ BACKEND_PATH = Path("results/backend_comparison.csv")
 REPAIR_PATH = Path("results/repair_results.csv")
 ATTEMPT_PATH = Path("results/attempt_results.csv")
 
+MODEL_REPAIR_PATH = Path("examples/sample_model_repair_results.csv")
+MODEL_ATTEMPT_PATH = Path("examples/sample_model_attempt_results.csv")
+
 
 def pct(value: float) -> str:
     return f"{value * 100:.1f}%"
@@ -19,6 +22,37 @@ def read_csv(path: Path) -> pd.DataFrame:
         raise FileNotFoundError(f"Missing {path}. Run the benchmark first.")
 
     return pd.read_csv(path)
+
+
+def add_model_sample(lines: list[str]) -> None:
+    if not MODEL_REPAIR_PATH.exists() or not MODEL_ATTEMPT_PATH.exists():
+        return
+
+    model_repair_df = pd.read_csv(MODEL_REPAIR_PATH)
+    model_attempt_df = pd.read_csv(MODEL_ATTEMPT_PATH)
+
+    model_name = model_repair_df["model"].iloc[0]
+    total_tasks = len(model_repair_df)
+    fixed_tasks = int(model_repair_df["after_passed"].sum())
+
+    avg_latency = model_attempt_df["model_latency_seconds"].mean()
+    avg_prompt_chars = model_attempt_df["prompt_chars"].mean()
+    avg_output_chars = model_attempt_df["output_chars"].mean()
+
+    lines.extend(
+        [
+            "",
+            "## Model sample run",
+            "",
+            f"- model: {model_name}",
+            f"- fixed tasks: {fixed_tasks}/{total_tasks}",
+            f"- avg model call time: {avg_latency:.2f} seconds",
+            f"- avg prompt chars: {avg_prompt_chars:.1f}",
+            f"- avg output chars: {avg_output_chars:.1f}",
+            "",
+            "This sample is saved under `examples/`. It is not run in CI because it needs a private API key.",
+        ]
+    )
 
 
 def main() -> None:
@@ -94,13 +128,20 @@ def main() -> None:
             f"- fixed tasks: {fixed_tasks}/{total_tasks}",
             f"- attempt rows logged: {attempt_rows}",
             f"- max attempts used by any task: {max_attempts_used}",
+        ]
+    )
+
+    add_model_sample(lines)
+
+    lines.extend(
+        [
             "",
             "## Notes",
             "",
-            "- The current repair backend is still the rule baseline.",
-            "- The timing numbers are not real LLM inference timings yet.",
-            "- The main useful result right now is that prompt layout and task order change prefix reuse a lot, even before using a real model backend.",
-            "- A model-server run can use the same scripts later.",
+            "- The default local run still uses the rule baseline.",
+            "- The model sample run is saved separately, so CI does not need a private API key.",
+            "- The main useful result right now is that prompt layout and task order change prefix reuse a lot.",
+            "- The next serious step is to test the same setup on less toy-like repair tasks.",
             "",
         ]
     )
