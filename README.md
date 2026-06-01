@@ -8,9 +8,23 @@ The basic idea is that coding agents usually send a lot of repeated text across 
 
 Right now, this repo is not trying to claim a final result. It is a working prototype to test the pipeline.
 
-## Current status in one line
+## Current status
 
-The current version runs a 6-task toy repair benchmark, measures prefix reuse, evaluates failing tests, applies a rule-based baseline fixer, saves before/after traces, and shows everything in a Streamlit dashboard.
+The current repo has 8 small repair tasks.
+
+The default local pipeline is still free/reproducible and uses the rule baseline:
+
+- no-fix baseline: 0/8 tasks fixed
+- rule baseline: 6/8 tasks fixed
+- prompt-layout experiment: normal, cache-aware, grouped cache-aware, and no-repo-context ablation
+
+I also ran saved model-server samples using a hosted model backend:
+
+- model repair sample: 8/8 tasks fixed
+- model prompt-layout sample: 4 prompt settings across all 8 tasks
+- real model latency, prompt size, output size, and pass/fail are logged
+
+The model samples are saved under `examples/`, but they are not rerun in CI because they require a private API key.
 
 ## What works right now
 
