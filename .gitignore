@@ -13,5 +13,7 @@ runs/
 results/*.csv
 results/*.jsonl
 
+.env
+
 # System files
 .DS_Store
