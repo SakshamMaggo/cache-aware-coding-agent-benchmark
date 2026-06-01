@@ -67,6 +67,12 @@ Create the environment:
     source .venv/bin/activate
     uv pip install -r requirements.txt
 
+Run the full local pipeline:
+
+    python -m src.run_all
+
+This runs the task evaluator, repair baseline, trace analyzer, prompt-layout experiment, backend comparison, and latest-run report.
+
 Run the prompt/cache benchmark:
 
     python -m src.runner
