@@ -68,6 +68,73 @@ def write_trace(trace: dict) -> None:
         f.write(json.dumps(trace) + "\n")
 
 
+def repair_task(task_dir: Path, fixer, max_attempts: int) -> dict:
+    code_path = task_dir / "buggy_code.py"
+    task_text = read_task_text(task_dir)
+    before_code = code_path.read_text()
+
+    before = run_pytest(task_dir)
+
+    attempts = []
+    final_code = before_code
+    final_result = before
+
+    total_fix_call_ms = 0.0
+    last_call = {}
+
+    for attempt_no in range(1, max_attempts + 1):
+        current_code = code_path.read_text()
+
+        fixed_code = fixer.fix(
+            task_id=task_dir.name,
+            task_text=task_text,
+            buggy_code=current_code,
+        )
+
+        call_info = fixer.last_call
+        last_call = call_info
+        total_fix_call_ms += float(call_info.get("latency_seconds", 0)) * 1000
+
+        code_path.write_text(fixed_code)
+        result = run_pytest(task_dir)
+
+        attempts.append(
+            {
+                "attempt": attempt_no,
+                "passed": result["passed"],
+                "tests_passed": result["tests_passed"],
+                "tests_failed": result["tests_failed"],
+                "model": call_info.get("model", ""),
+                "model_latency_seconds": call_info.get("latency_seconds", ""),
+                "prompt_chars": call_info.get("prompt_chars", ""),
+                "output_chars": call_info.get("output_chars", ""),
+            }
+        )
+
+        final_code = fixed_code
+        final_result = result
+
+        if result["passed"]:
+            break
+
+    return {
+        "task_id": task_dir.name,
+        "fixer": fixer.name,
+        "model": last_call.get("model", ""),
+        "before": before,
+        "after": final_result,
+        "before_code": before_code,
+        "after_code": final_code,
+        "attempts": attempts,
+        "attempts_used": len(attempts),
+        "max_attempts": max_attempts,
+        "total_fix_call_ms": round(total_fix_call_ms, 4),
+        "last_model_latency_seconds": last_call.get("latency_seconds", ""),
+        "last_prompt_chars": last_call.get("prompt_chars", ""),
+        "last_output_chars": last_call.get("output_chars", ""),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -75,6 +142,12 @@ def main() -> None:
         choices=["rule", "model"],
         default="rule",
         help="which fixer backend to use",
+    )
+    parser.add_argument(
+        "--max-attempts",
+        type=int,
+        default=1,
+        help="maximum repair attempts per task",
     )
     args = parser.parse_args()
 
@@ -97,43 +170,33 @@ def main() -> None:
     for task_dir in task_dirs:
         print(f"Repairing {task_dir.name}...")
 
-        code_path = task_dir / "buggy_code.py"
-        task_text = read_task_text(task_dir)
-        before_code = code_path.read_text()
-
-        before = run_pytest(task_dir)
-
-        fixed_code = fixer.fix(
-            task_id=task_dir.name,
-            task_text=task_text,
-            buggy_code=before_code,
+        result = repair_task(
+            task_dir=task_dir,
+            fixer=fixer,
+            max_attempts=args.max_attempts,
         )
 
-        code_path.write_text(fixed_code)
+        before = result["before"]
+        after = result["after"]
 
-        after_code = code_path.read_text()
-        after = run_pytest(task_dir)
-
-        call_info = fixer.last_call
-
-        trace = {
-            "task_id": task_dir.name,
-            "fixer": fixer.name,
-            "model": call_info.get("model", ""),
-            "model_latency_seconds": call_info.get("latency_seconds", ""),
-            "prompt_chars": call_info.get("prompt_chars", ""),
-            "output_chars": call_info.get("output_chars", ""),
-            "before_passed": before["passed"],
-            "after_passed": after["passed"],
-            "before_code": before_code,
-            "after_code": after_code,
-        }
-
-        write_trace(trace)
+        write_trace(
+            {
+                "task_id": result["task_id"],
+                "fixer": result["fixer"],
+                "model": result["model"],
+                "attempts_used": result["attempts_used"],
+                "max_attempts": result["max_attempts"],
+                "before_passed": before["passed"],
+                "after_passed": after["passed"],
+                "before_code": result["before_code"],
+                "after_code": result["after_code"],
+                "attempts": result["attempts"],
+            }
+        )
 
         rows.append(
             {
-                "task_id": task_dir.name,
+                "task_id": result["task_id"],
                 "before_passed": before["passed"],
                 "before_tests_passed": before["tests_passed"],
                 "before_tests_failed": before["tests_failed"],
@@ -142,11 +205,14 @@ def main() -> None:
                 "after_tests_failed": after["tests_failed"],
                 "after_total_tests": after["total_tests"],
                 "repair_runtime_seconds": after["runtime_seconds"],
-                "fixer": fixer.name,
-                "model": call_info.get("model", ""),
-                "model_latency_seconds": call_info.get("latency_seconds", ""),
-                "prompt_chars": call_info.get("prompt_chars", ""),
-                "output_chars": call_info.get("output_chars", ""),
+                "fixer": result["fixer"],
+                "model": result["model"],
+                "attempts_used": result["attempts_used"],
+                "max_attempts": result["max_attempts"],
+                "total_fix_call_ms": result["total_fix_call_ms"],
+                "model_latency_seconds": result["last_model_latency_seconds"],
+                "prompt_chars": result["last_prompt_chars"],
+                "output_chars": result["last_output_chars"],
             }
         )
 

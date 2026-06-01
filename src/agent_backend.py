@@ -31,11 +31,11 @@ class RuleFixer(BaseFixer):
         elapsed = time.perf_counter() - start
 
         self.last_call = {
-            "model": "rule_based",
-            "latency_seconds": round(elapsed, 4),
-            "prompt_chars": len(task_text) + len(buggy_code),
-            "output_chars": len(fixed_code),
-        }
+             "model": "rule_based",
+             "latency_seconds": round(elapsed, 8),
+             "prompt_chars": len(task_text) + len(buggy_code),
+             "output_chars": len(fixed_code),
+}
 
         return fixed_code
 
@@ -99,7 +99,7 @@ class ModelServerFixer(BaseFixer):
 
         self.last_call = {
             "model": self.model,
-            "latency_seconds": round(elapsed, 4),
+            "latency_seconds": round(elapsed, 8),
             "prompt_chars": len(prompt),
             "output_chars": len(fixed_code),
         }
