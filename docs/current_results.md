@@ -1,67 +1,72 @@
 # Current Results
 
-This is a short note on the current 6-task run.
+This is a short note on the current 9-task run.
 
-The benchmark compares three settings:
+The benchmark currently compares four prompt-layout settings:
 
 1. normal prompt layout with mixed task order
 2. cache-aware prompt layout with mixed task order
 3. cache-aware prompt layout with grouped task order
+4. cache-aware prompt layout without repo context, using grouped task order
 
-The repair backend is still the rule-based baseline, so the main thing to look at here is prompt structure, not model quality.
+The default local run still uses the rule-based baseline. So the default CI-safe result is mainly useful for checking the benchmark pipeline, prompt structure, task ordering, traces, and reports. It should not be read as a real model-quality result.
 
 ## Main observation
 
-The normal prompt layout gives very low adjacent prefix reuse. In the current run, recent prefix reuse stays around 0.02 after the first task.
+The normal prompt layout gives very low adjacent prefix reuse. In the current run, recent prefix reuse stays close to zero.
 
 The cache-aware prompt layout improves this because shared instructions and repo context are placed earlier in the prompt.
 
-The grouped cache-aware run improves recent prefix reuse further for similar tasks. This happens because tasks from the same group, such as math utilities, string utilities, or list utilities, are placed next to each other.
+The grouped cache-aware run improves recent prefix reuse further because tasks from similar utility groups are placed closer together.
+
+The no-repo-context ablation is useful because it separates two effects:
+
+- how much reuse comes from a stable prompt layout
+- how much reuse comes from including shared repo context
 
 ## Why this matters
 
 Prefix caching and KV-cache reuse depend on prompts sharing the same beginning tokens.
 
-So if coding-agent workloads can be arranged so repeated parts appear earlier, and similar tasks are scheduled together, the workload should be more friendly to efficient serving systems.
+So if coding-agent workloads can be written so repeated parts appear earlier, and similar tasks are scheduled together, the workload should be more friendly to efficient serving systems.
 
-This does not prove a real speedup yet. It only shows that the workload can be made structurally more cache-friendly.
+This does not prove a serving-system speedup by itself. It shows that the workload can be made structurally more cache-friendly, and that the same experiment path can now run with a real model backend.
 
 ## Repair quality
 
-The repair pass rate stays unchanged in the current rule-based run. All tasks fail before repair and pass after repair across the tested settings.
+The default rule baseline currently fixes 6/9 tasks.
 
-This is useful because it means the prompt-layout experiment is not breaking the repair loop in the current setup.
+This is a better signal than the earlier toy-only run because the newer medium tasks are not all solved by simple rules. The rule baseline is still useful as a cheap reproducible check, but it is no longer pretending to solve the full benchmark.
 
-## Current limitation
+The no-fix baseline fixes 0/9 tasks.
 
-The current fixer is rule-based, so the fixer latency is not meaningful as model inference latency.
+## Model backend sample
 
-The task set is also small and toy-like. The next useful step is to run the same experiment through a real model-server backend, and later through vLLM or SGLang.
+I also ran the model-server backend on the current 9-task set using a hosted model endpoint.
 
-## Model backend check
+This confirms that the --fixer model path is wired up and can produce real repair outputs.
 
-I also ran the model-server backend once on the current 6-task set using a hosted model endpoint.
+In the saved model repair sample:
 
-This is not a full benchmark result yet, but it confirms that the `--fixer model` path is actually wired up and can produce real repair outputs.
-
-In the sample run:
-
-- all 6 tasks were attempted with `model_server`
-- the run logged real model latency
+- all 9 tasks were attempted with model_server
+- the model fixed 9/9 tasks
+- real model latency was logged
 - prompt size and output size were saved
 - attempt-level traces were written
 
-The sample files are saved separately under `examples/`:
+The sample files are saved separately under examples/:
 
-- `sample_model_repair_results.csv`
-- `sample_model_attempt_results.csv`
-- `sample_model_repair_traces.jsonl`
+- sample_model_repair_results.csv
+- sample_model_attempt_results.csv
+- sample_model_repair_traces.jsonl
 
 I am still treating the rule baseline as the default reproducible run because GitHub Actions should not depend on a private API key.
 
-I also ran a full model-based prompt-layout experiment on all 8 current tasks using:
+## Model prompt experiment sample
 
-    python -m src.experiment_runner --fixer model --max-tasks 8
+I also ran a full model-based prompt-layout experiment on all 9 current tasks using:
+
+    python -m src.experiment_runner --fixer model --max-tasks 9
 
 This produced a real model-backed experiment CSV with four prompt settings:
 
@@ -72,11 +77,19 @@ This produced a real model-backed experiment CSV with four prompt settings:
 
 The sample file is saved as:
 
-- `examples/sample_model_experiment_results.csv`
+- examples/sample_model_experiment_results.csv
 
-In this run, all four prompt settings kept the model pass rate at 8/8 on the current task set. The main difference was prefix reuse: normal prompting had very low recent prefix reuse, while the cache-aware and grouped settings had much higher recent prefix reuse.
+In this run, all four prompt settings solved 9/9 tasks. The main difference was prefix reuse: normal prompting had very low recent prefix reuse, while cache-aware and grouped layouts had much higher recent prefix reuse.
 
 This is still a small benchmark, but it confirms that the prompt-layout experiment can run through the model-server backend, not only through the rule baseline.
+
+## Current limitations
+
+The task set is still small. It is better than the first toy-only version, but it is not close to SWE-bench-style realism yet.
+
+The saved model runs use one hosted model backend. This is enough to prove that the model path works, but not enough to make a general claim about coding-agent serving performance.
+
+The current prefix-reuse metric is a proxy. The next stronger version should connect this to real serving metrics such as TTFT, total latency, throughput, and cache hit behavior on a local model-serving backend.
 
 ## Next result to aim for
 
@@ -89,9 +102,9 @@ The next meaningful result should compare:
 - output size
 - retries or failed attempts
 
-across at least two backends:
+across at least two backend types:
 
-1. rule baseline
-2. model-server backend
+1. hosted model-server backend
+2. local OpenAI-compatible backend, eventually vLLM or SGLang
 
-Later, the model-server backend can point to local vLLM or SGLang endpoints.
+The longer-term goal is to test whether cache-aware prompt layout and grouped scheduling improve serving-side behavior, not just whether they improve a toy prefix-reuse score.
