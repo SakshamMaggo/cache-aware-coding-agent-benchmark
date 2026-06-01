@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 
 from src.fixer import generate_rule_based_fix
@@ -6,6 +7,9 @@ from src.fixer import generate_rule_based_fix
 
 class BaseFixer:
     name = "base"
+
+    def __init__(self) -> None:
+        self.last_call = {}
 
     def fix(self, task_id: str, task_text: str, buggy_code: str) -> str:
         raise NotImplementedError("fix() is not implemented for this fixer")
@@ -22,7 +26,18 @@ class RuleFixer(BaseFixer):
     name = "rule_baseline"
 
     def fix(self, task_id: str, task_text: str, buggy_code: str) -> str:
-        return generate_rule_based_fix(task_id, buggy_code)
+        start = time.perf_counter()
+        fixed_code = generate_rule_based_fix(task_id, buggy_code)
+        elapsed = time.perf_counter() - start
+
+        self.last_call = {
+            "model": "rule_based",
+            "latency_seconds": round(elapsed, 4),
+            "prompt_chars": len(task_text) + len(buggy_code),
+            "output_chars": len(fixed_code),
+        }
+
+        return fixed_code
 
 
 class ModelServerFixer(BaseFixer):
@@ -36,6 +51,8 @@ class ModelServerFixer(BaseFixer):
     name = "model_server"
 
     def __init__(self) -> None:
+        super().__init__()
+
         try:
             from openai import OpenAI
         except ImportError as exc:
@@ -59,14 +76,27 @@ class ModelServerFixer(BaseFixer):
             "Do not include markdown. Do not include explanation."
         )
 
+        start = time.perf_counter()
+
         response = self.client.chat.completions.create(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0,
         )
 
+        elapsed = time.perf_counter() - start
+
         raw_code = response.choices[0].message.content or ""
-        return strip_code_fence(raw_code)
+        fixed_code = strip_code_fence(raw_code)
+
+        self.last_call = {
+            "model": self.model,
+            "latency_seconds": round(elapsed, 4),
+            "prompt_chars": len(prompt),
+            "output_chars": len(fixed_code),
+        }
+
+        return fixed_code
 
 
 def strip_code_fence(text: str) -> str:

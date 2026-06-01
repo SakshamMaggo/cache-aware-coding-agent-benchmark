@@ -1,9 +1,9 @@
+import argparse
 import csv
 import json
 import re
 import subprocess
 import time
-import argparse
 from pathlib import Path
 
 from src.agent_backend import ModelServerFixer, RuleFixer, read_task_text
@@ -50,6 +50,7 @@ def run_pytest(task_dir: Path) -> dict:
         "runtime_seconds": round(elapsed, 4),
     }
 
+
 def pick_fixer(name: str):
     if name == "rule":
         return RuleFixer()
@@ -58,6 +59,8 @@ def pick_fixer(name: str):
         return ModelServerFixer()
 
     raise ValueError(f"Unknown fixer: {name}")
+
+
 def write_trace(trace: dict) -> None:
     TRACE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
@@ -66,23 +69,26 @@ def write_trace(trace: dict) -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--fixer",
+        choices=["rule", "model"],
+        default="rule",
+        help="which fixer backend to use",
+    )
+    args = parser.parse_args()
+
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     if TRACE_PATH.exists():
         TRACE_PATH.unlink()
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-    "--fixer",
-    choices=["rule", "model"],
-    default="rule",
-    help="which fixer backend to use",
-)
-    args = parser.parse_args()
+
     run_dir = reset_run_workspace()
     fixer = pick_fixer(args.fixer)
 
     task_dirs = sorted(
-        path for path in run_dir.iterdir()
+        path
+        for path in run_dir.iterdir()
         if path.is_dir() and path.name.startswith(("task_", "tsk_"))
     )
 
@@ -108,16 +114,22 @@ def main() -> None:
         after_code = code_path.read_text()
         after = run_pytest(task_dir)
 
-        write_trace(
-            {
-                "task_id": task_dir.name,
-                "fixer": fixer.name,
-                "before_passed": before["passed"],
-                "after_passed": after["passed"],
-                "before_code": before_code,
-                "after_code": after_code,
-            }
-        )
+        call_info = fixer.last_call
+
+        trace = {
+            "task_id": task_dir.name,
+            "fixer": fixer.name,
+            "model": call_info.get("model", ""),
+            "model_latency_seconds": call_info.get("latency_seconds", ""),
+            "prompt_chars": call_info.get("prompt_chars", ""),
+            "output_chars": call_info.get("output_chars", ""),
+            "before_passed": before["passed"],
+            "after_passed": after["passed"],
+            "before_code": before_code,
+            "after_code": after_code,
+        }
+
+        write_trace(trace)
 
         rows.append(
             {
@@ -131,6 +143,10 @@ def main() -> None:
                 "after_total_tests": after["total_tests"],
                 "repair_runtime_seconds": after["runtime_seconds"],
                 "fixer": fixer.name,
+                "model": call_info.get("model", ""),
+                "model_latency_seconds": call_info.get("latency_seconds", ""),
+                "prompt_chars": call_info.get("prompt_chars", ""),
+                "output_chars": call_info.get("output_chars", ""),
             }
         )
 
