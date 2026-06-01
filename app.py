@@ -38,7 +38,7 @@ Latency and TTFT are simulated for now.
 )
 
 results_path = Path("results/dummy_cache_benchmark_results.csv")
-
+experiment_results_path = Path("results/experiment_results.csv")
 if not results_path.exists():
     st.warning("No results found yet. Run `python -m src.runner` first.")
     st.stop()
@@ -203,6 +203,81 @@ st.dataframe(raw, use_container_width=True, hide_index=True)
 
 st.divider()
 
+st.subheader("Prompt layout experiment")
+
+if experiment_results_path.exists():
+    exp_df = pd.read_csv(experiment_results_path)
+
+    exp_summary = (
+        exp_df.groupby("experiment")
+        .agg(
+            avg_prefix_reuse=("prefix_reuse", "mean"),
+            pass_rate=("after_passed", "mean"),
+            avg_prompt_tokens=("prompt_tokens", "mean"),
+            avg_fix_call_seconds=("fix_call_seconds", "mean"),
+        )
+        .reset_index()
+    )
+
+    label_map = {
+        "normal_original": "normal prompt",
+        "cache_original": "cache-aware prompt",
+        "cache_grouped": "cache-aware grouped",
+    }
+
+    exp_summary["run"] = exp_summary["experiment"].map(label_map)
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric(
+        "Normal avg prefix reuse",
+        f"{exp_summary.loc[exp_summary['experiment'] == 'normal_original', 'avg_prefix_reuse'].iloc[0]:.3f}",
+    )
+    c2.metric(
+        "Cache-aware avg prefix reuse",
+        f"{exp_summary.loc[exp_summary['experiment'] == 'cache_original', 'avg_prefix_reuse'].iloc[0]:.3f}",
+    )
+    c3.metric(
+        "Repair pass rate",
+        f"{exp_summary['pass_rate'].mean():.0%}",
+    )
+
+    fig_exp = px.bar(
+        exp_summary,
+        x="avg_prefix_reuse",
+        y="run",
+        orientation="h",
+        text=exp_summary["avg_prefix_reuse"].round(3),
+        labels={"avg_prefix_reuse": "average prefix reuse", "run": ""},
+        title="Cache-aware prompt layout creates much more shared prefix",
+    )
+    fig_exp.update_traces(textposition="outside")
+    fig_exp.update_layout(
+        height=320,
+        showlegend=False,
+        xaxis_range=[0, 1],
+        margin=dict(l=20, r=40, t=55, b=20),
+    )
+    st.plotly_chart(fig_exp, use_container_width=True)
+
+    st.caption(
+        "This experiment compares normal prompting against a cache-aware layout. The current backend is still the rule baseline, so the useful signal here is prefix structure and whether repair success stays unchanged."
+    )
+
+    st.dataframe(
+        exp_summary.rename(
+            columns={
+                "run": "Run",
+                "avg_prefix_reuse": "Avg prefix reuse",
+                "pass_rate": "Pass rate",
+                "avg_prompt_tokens": "Avg prompt tokens",
+                "avg_fix_call_seconds": "Avg fix call time",
+            }
+        )[["Run", "Avg prefix reuse", "Pass rate", "Avg prompt tokens", "Avg fix call time"]],
+        use_container_width=True,
+        hide_index=True,
+    )
+else:
+    st.info("No experiment results found yet. Run `python -m src.experiment_runner` first.")
 st.subheader("Code task test results")
 
 test_results_path = Path("results/task_test_results.csv")
