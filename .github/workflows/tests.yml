@@ -28,6 +28,9 @@ jobs:
       - name: run rule-based repair baseline
         run: python -m src.repair_runner --fixer rule
 
+      - name: analyze repair traces
+        run: python -m src.trace_analyzer
+        
       - name: run prompt-layout experiment
         run: python -m src.experiment_runner
 
