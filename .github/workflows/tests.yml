@@ -30,9 +30,12 @@ jobs:
 
       - name: analyze repair traces
         run: python -m src.trace_analyzer
-        
+
       - name: run prompt-layout experiment
         run: python -m src.experiment_runner
 
       - name: run backend comparison
         run: python -m src.backend_compare
+
+      - name: make latest run report
+        run: python -m src.make_report
