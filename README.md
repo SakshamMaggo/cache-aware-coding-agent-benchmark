@@ -6,6 +6,10 @@ The basic idea is that coding agents usually send a lot of repeated text across 
 
 Right now, this repo is not trying to claim a final result. It is a working prototype to test the pipeline.
 
+## Current status in one line
+
+The current version runs a 6-task toy repair benchmark, measures prefix reuse, evaluates failing tests, applies a rule-based baseline fixer, saves before/after traces, and shows everything in a Streamlit dashboard.
+
 ## What works right now
 
 - Builds normal and cache-aware prompts for small code-repair tasks.
