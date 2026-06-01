@@ -1,6 +1,6 @@
 # Current Results
 
-This is a short note on the current 9-task run.
+This is a short note on the current 10-task run.
 
 The benchmark currently compares four prompt-layout settings:
 
@@ -34,22 +34,22 @@ This does not prove a serving-system speedup by itself. It shows that the worklo
 
 ## Repair quality
 
-The default rule baseline currently fixes 6/9 tasks.
+The default rule baseline currently fixes 6/10 tasks.
 
 This is a better signal than the earlier toy-only run because the newer medium tasks are not all solved by simple rules. The rule baseline is still useful as a cheap reproducible check, but it is no longer pretending to solve the full benchmark.
 
-The no-fix baseline fixes 0/9 tasks.
+The no-fix baseline fixes 0/10 tasks.
 
 ## Model backend sample
 
-I also ran the model-server backend on the current 9-task set using a hosted model endpoint.
+I also ran the model-server backend on the current 10-task set using a hosted model endpoint.
 
 This confirms that the --fixer model path is wired up and can produce real repair outputs.
 
 In the saved model repair sample:
 
-- all 9 tasks were attempted with model_server
-- the model fixed 9/9 tasks
+- all 10 tasks were attempted with model_server
+- the model fixed 10/10 tasks
 - real model latency was logged
 - prompt size and output size were saved
 - attempt-level traces were written
@@ -64,9 +64,9 @@ I am still treating the rule baseline as the default reproducible run because Gi
 
 ## Model prompt experiment sample
 
-I also ran a full model-based prompt-layout experiment on all 9 current tasks using:
+I also ran a full model-based prompt-layout experiment on all 10 current tasks using:
 
-    python -m src.experiment_runner --fixer model --max-tasks 9
+    python -m src.experiment_runner --fixer model --max-tasks 10
 
 This produced a real model-backed experiment CSV with four prompt settings:
 
@@ -79,7 +79,7 @@ The sample file is saved as:
 
 - examples/sample_model_experiment_results.csv
 
-In this run, all four prompt settings solved 9/9 tasks. The main difference was prefix reuse: normal prompting had very low recent prefix reuse, while cache-aware and grouped layouts had much higher recent prefix reuse.
+In this run, all four prompt settings solved 10/10 tasks. The main difference was prefix reuse: normal prompting had very low recent prefix reuse, while cache-aware and grouped layouts had much higher recent prefix reuse.
 
 This is still a small benchmark, but it confirms that the prompt-layout experiment can run through the model-server backend, not only through the rule baseline.
 
