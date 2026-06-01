@@ -35,41 +35,41 @@ def task_number(task_id: str) -> int:
     return int(task_id.split("_")[-1])
 
 
-def repo_group(task_id: str) -> str:
-    number = task_number(task_id)
+def read_task_meta(task_dir: Path) -> dict:
+    meta_path = task_dir / "metadata.json"
 
-    if number in {1, 2}:
-        return "math_utils"
+    if not meta_path.exists():
+        return {"repo_group": "misc_utils"}
 
-    if number in {3, 4}:
-        return "string_utils"
+    with open(meta_path, "r") as f:
+        return json.load(f)
 
-    if number in {5, 6}:
-        return "list_utils"
 
-    return "misc_utils"
+def repo_group(task_dir: Path) -> str:
+    meta = read_task_meta(task_dir)
+    return meta.get("repo_group", "misc_utils")
 
 
 def repo_context(group: str) -> str:
     contexts = {
         "math_utils": (
             "Repository context:\n"
-            "This repo contains small math utility functions. Most bugs are edge-case "
-            "or off-by-one errors in numeric helper functions.\n"
+            "This repo has small math helper functions. Bugs are usually simple "
+            "edge cases, off-by-one issues, or wrong arithmetic.\n"
         ),
         "string_utils": (
             "Repository context:\n"
-            "This repo contains small string processing helpers. Most bugs involve "
-            "normalization, whitespace, casing, or simple parsing behavior.\n"
+            "This repo has small string helpers. Bugs usually involve whitespace, "
+            "case handling, normalization, or basic parsing.\n"
         ),
         "list_utils": (
             "Repository context:\n"
-            "This repo contains list and collection helpers. Most bugs involve empty "
-            "inputs, negative values, or simple aggregation logic.\n"
+            "This repo has list and collection helpers. Bugs usually involve empty "
+            "inputs, negative values, or aggregation logic.\n"
         ),
         "misc_utils": (
             "Repository context:\n"
-            "This repo contains small Python utility functions with deterministic tests.\n"
+            "This repo has small Python utility functions with deterministic tests.\n"
         ),
     }
 
@@ -103,7 +103,7 @@ def order_tasks(task_dirs: list[Path], order_mode: str) -> list[Path]:
     if order_mode == "grouped":
         return sorted(
             task_dirs,
-            key=lambda path: (repo_group(path.name), task_number(path.name)),
+            key=lambda path: (repo_group(path), task_number(path.name)),
         )
 
     raise ValueError(f"Unknown order mode: {order_mode}")
@@ -112,7 +112,7 @@ def order_tasks(task_dirs: list[Path], order_mode: str) -> list[Path]:
 def build_cache_prompt(task_dir: Path) -> str:
     task_text = read_task_text(task_dir)
     buggy_code = (task_dir / "buggy_code.py").read_text()
-    group = repo_group(task_dir.name)
+    group = repo_group(task_dir)
 
     return (
         "You are a careful coding agent.\n"
@@ -133,7 +133,7 @@ def build_cache_prompt(task_dir: Path) -> str:
 def build_prompt(task_dir: Path, prompt_mode: str) -> str:
     task_text = read_task_text(task_dir)
     buggy_code = (task_dir / "buggy_code.py").read_text()
-    group = repo_group(task_dir.name)
+    group = repo_group(task_dir)
 
     task = {
         "task_id": task_dir.name,
@@ -209,7 +209,7 @@ def run_one_experiment(
             {
                 "experiment": experiment_name,
                 "task_id": task_dir.name,
-                "repo_group": repo_group(task_dir.name),
+                "repo_group": repo_group(task_dir),
                 "position": position,
                 "prompt_mode": prompt_mode,
                 "order_mode": order_mode,
