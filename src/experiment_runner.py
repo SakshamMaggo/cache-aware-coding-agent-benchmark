@@ -1,3 +1,4 @@
+import argparse
 import csv
 import json
 import shutil
@@ -5,7 +6,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from src.agent_backend import RuleFixer, read_task_text
+from src.agent_backend import ModelServerFixer, RuleFixer, read_task_text
 from src.metrics import cacheability_score, count_tokens
 from src.prompts import build_normal_prompt
 from src.workspace import SOURCE_TASKS_DIR
@@ -71,6 +72,16 @@ def repo_context(group: str) -> str:
             "This repo has list and collection helpers. Bugs usually involve empty "
             "inputs, negative values, or aggregation logic.\n"
         ),
+        "file_utils": (
+            "Repository context:\n"
+            "This repo has file and path helpers. Bugs usually involve extension "
+            "checks, path handling, or simple filtering.\n"
+        ),
+        "dict_utils": (
+            "Repository context:\n"
+            "This repo has dictionary helpers. Bugs usually involve merge logic, "
+            "mutation, defaults, or count updates.\n"
+        ),
         "misc_utils": (
             "Repository context:\n"
             "This repo has small Python utility functions with deterministic tests.\n"
@@ -96,7 +107,7 @@ def make_run_workspace(experiment_name: str) -> Path:
 
 def order_tasks(task_dirs: list[Path], order_mode: str) -> list[Path]:
     if order_mode == "original":
-        mixed_order = [1, 3, 5, 2, 4, 6]
+        mixed_order = [1, 3, 5, 7, 2, 4, 6, 8]
         rank = {task_num: i for i, task_num in enumerate(mixed_order)}
 
         return sorted(
@@ -179,6 +190,16 @@ def build_prompt(task_dir: Path, prompt_mode: str) -> str:
     raise ValueError(f"Unknown prompt mode: {prompt_mode}")
 
 
+def pick_fixer(name: str):
+    if name == "rule":
+        return RuleFixer()
+
+    if name == "model":
+        return ModelServerFixer()
+
+    raise ValueError(f"Unknown fixer: {name}")
+
+
 def run_pytest(task_dir: Path) -> bool:
     result = subprocess.run(
         ["pytest", "-q"],
@@ -194,9 +215,11 @@ def run_one_experiment(
     experiment_name: str,
     prompt_mode: str,
     order_mode: str,
+    fixer_name: str,
+    max_tasks: int | None,
 ) -> list[dict]:
     run_dir = make_run_workspace(experiment_name)
-    fixer = RuleFixer()
+    fixer = pick_fixer(fixer_name)
 
     task_dirs = sorted(
         path
@@ -204,6 +227,9 @@ def run_one_experiment(
         if path.is_dir() and path.name.startswith(("task_", "tsk_"))
     )
     task_dirs = order_tasks(task_dirs, order_mode)
+
+    if max_tasks is not None:
+        task_dirs = task_dirs[:max_tasks]
 
     rows = []
     previous_prompts = []
@@ -230,6 +256,8 @@ def run_one_experiment(
         )
         fix_time = time.perf_counter() - start
 
+        call_info = getattr(fixer, "last_call", {})
+
         code_path.write_text(fixed_code)
         after_passed = run_pytest(task_dir)
 
@@ -244,12 +272,16 @@ def run_one_experiment(
                 "prompt_mode": prompt_mode,
                 "order_mode": order_mode,
                 "fixer": fixer.name,
+                "model": call_info.get("model", ""),
                 "before_passed": before_passed,
                 "after_passed": after_passed,
                 "prompt_tokens": prompt_tokens,
                 "best_prefix_reuse": best_prefix_reuse,
                 "recent_prefix_reuse": recent_prefix_reuse,
                 "fix_call_ms": round(fix_time * 1000, 4),
+                "model_latency_seconds": call_info.get("latency_seconds", ""),
+                "model_prompt_chars": call_info.get("prompt_chars", ""),
+                "model_output_chars": call_info.get("output_chars", ""),
                 "output_chars": len(fixed_code),
             }
         )
@@ -260,6 +292,21 @@ def run_one_experiment(
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--fixer",
+        choices=["rule", "model"],
+        default="rule",
+        help="which fixer backend to use",
+    )
+    parser.add_argument(
+        "--max-tasks",
+        type=int,
+        default=None,
+        help="maximum number of tasks per experiment",
+    )
+    args = parser.parse_args()
+
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     all_rows = []
@@ -267,14 +314,19 @@ def main() -> None:
     for experiment in load_experiments():
         experiment_name = experiment["name"]
 
-        print(f"Running {experiment_name}...")
+        print(f"Running {experiment_name} with {args.fixer} fixer...")
 
         rows = run_one_experiment(
             experiment_name=experiment_name,
             prompt_mode=experiment["prompt_mode"],
             order_mode=experiment["order_mode"],
+            fixer_name=args.fixer,
+            max_tasks=args.max_tasks,
         )
         all_rows.extend(rows)
+
+    if not all_rows:
+        raise ValueError("No experiment rows were generated.")
 
     with open(OUTPUT_PATH, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=list(all_rows[0].keys()))
