@@ -6,10 +6,10 @@ This is a quick summary from the latest local run.
 
 | run | recent reuse | best reuse | pass rate | avg prompt tokens |
 |---|---:|---:|---:|---:|
-| cache_grouped | 0.386 | 0.387 | 75.0% | 118.9 |
-| cache_no_repo_grouped | 0.365 | 0.365 | 75.0% | 96.6 |
-| cache_original | 0.279 | 0.380 | 75.0% | 118.9 |
-| normal_original | 0.015 | 0.015 | 75.0% | 192.8 |
+| cache_grouped | 0.366 | 0.366 | 100.0% | 121.2 |
+| cache_no_repo_grouped | 0.365 | 0.365 | 100.0% | 96.6 |
+| cache_original | 0.255 | 0.356 | 100.0% | 121.2 |
+| normal_original | 0.015 | 0.015 | 100.0% | 192.8 |
 
 ## Backend comparison
 
@@ -23,6 +23,17 @@ This is a quick summary from the latest local run.
 - fixed tasks: 6/8
 - attempt rows logged: 10
 - max attempts used by any task: 2
+
+## Model prompt experiment sample
+
+| run | tasks | pass rate | recent reuse | avg model call time |
+|---|---:|---:|---:|---:|
+| cache_grouped | 8 | 100.0% | 0.366 | 1.08s |
+| cache_no_repo_grouped | 8 | 100.0% | 0.365 | 2.08s |
+| cache_original | 8 | 100.0% | 0.255 | 1.10s |
+| normal_original | 8 | 100.0% | 0.015 | 1.44s |
+
+This sample is saved under `examples/sample_model_experiment_results.csv`. It is not run in CI because it needs a private API key.
 
 ## Model sample run
 

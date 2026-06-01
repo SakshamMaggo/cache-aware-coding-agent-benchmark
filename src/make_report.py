@@ -11,7 +11,7 @@ ATTEMPT_PATH = Path("results/attempt_results.csv")
 
 MODEL_REPAIR_PATH = Path("examples/sample_model_repair_results.csv")
 MODEL_ATTEMPT_PATH = Path("examples/sample_model_attempt_results.csv")
-
+MODEL_EXPERIMENT_PATH = Path("examples/sample_model_experiment_results.csv")
 
 def pct(value: float) -> str:
     return f"{value * 100:.1f}%"
@@ -27,7 +27,49 @@ def read_csv(path: Path) -> pd.DataFrame:
 def add_model_sample(lines: list[str]) -> None:
     if not MODEL_REPAIR_PATH.exists() or not MODEL_ATTEMPT_PATH.exists():
         return
+def add_model_experiment_sample(lines: list[str]) -> None:
+    if not MODEL_EXPERIMENT_PATH.exists():
+        return
 
+    model_exp_df = pd.read_csv(MODEL_EXPERIMENT_PATH)
+
+    summary = (
+        model_exp_df.groupby("experiment")
+        .agg(
+            tasks=("task_id", "count"),
+            pass_rate=("after_passed", "mean"),
+            recent_reuse=("recent_prefix_reuse", "mean"),
+            avg_latency=("model_latency_seconds", "mean"),
+        )
+        .reset_index()
+    )
+
+    lines.extend(
+        [
+            "",
+            "## Model prompt experiment sample",
+            "",
+            "| run | tasks | pass rate | recent reuse | avg model call time |",
+            "|---|---:|---:|---:|---:|",
+        ]
+    )
+
+    for _, row in summary.iterrows():
+        lines.append(
+            "| "
+            f"{row['experiment']} | "
+            f"{int(row['tasks'])} | "
+            f"{pct(row['pass_rate'])} | "
+            f"{row['recent_reuse']:.3f} | "
+            f"{row['avg_latency']:.2f}s |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "This sample is saved under `examples/sample_model_experiment_results.csv`. It is not run in CI because it needs a private API key.",
+        ]
+    )
     model_repair_df = pd.read_csv(MODEL_REPAIR_PATH)
     model_attempt_df = pd.read_csv(MODEL_ATTEMPT_PATH)
 
@@ -132,7 +174,7 @@ def main() -> None:
     )
 
     add_model_sample(lines)
-
+    add_model_experiment_sample(lines)
     lines.extend(
         [
             "",
