@@ -111,6 +111,25 @@ Current metrics include:
 
 TTFT means time to first token. In the current prompt/cache benchmark, latency and TTFT are still simulated. In the repair pipeline, the fixer call time is now logged separately so real model-server runs can be compared later.
 
+## Backend plan
+
+The benchmark currently runs with a rule-based baseline:
+
+    python -m src.repair_runner --fixer rule
+
+The code also has a generic model-server mode:
+
+    python -m src.repair_runner --fixer model
+
+The model-server path is intentionally provider-neutral. The goal is to later compare the same repair tasks across:
+
+- rule-based baseline;
+- hosted model-server endpoint;
+- local vLLM endpoint;
+- local SGLang endpoint.
+
+The main comparison I want to run later is the tradeoff between repair quality and serving efficiency: latency, prompt size, output size, retries, and eventually TTFT / throughput.
+
 ## Next steps
 
 - Add a real model-server backend.
