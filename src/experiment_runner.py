@@ -39,7 +39,11 @@ def read_task_meta(task_dir: Path) -> dict:
     meta_path = task_dir / "metadata.json"
 
     if not meta_path.exists():
-        return {"repo_group": "misc_utils"}
+        return {
+            "repo_group": "misc_utils",
+            "bug_type": "unknown",
+            "difficulty": "unknown",
+        }
 
     with open(meta_path, "r") as f:
         return json.load(f)
@@ -115,12 +119,32 @@ def build_cache_prompt(task_dir: Path) -> str:
     group = repo_group(task_dir)
 
     return (
-        "You are a careful coding agent.\n"
-        "Fix the smallest possible bug while keeping the original function simple.\n\n"
+        "Fix the Python function below.\n"
+        "Keep the fix small and do not rewrite unrelated code.\n\n"
         "Output format:\n"
         "- Bug summary\n"
         "- Fixed code\n\n"
         f"{repo_context(group)}\n"
+        "Task-specific section:\n"
+        f"Task ID: {task_dir.name}\n"
+        f"Repository group: {group}\n"
+        "Language: python\n\n"
+        f"Problem:\n{task_text}\n\n"
+        f"Buggy code:\n{buggy_code}\n"
+    )
+
+
+def build_cache_prompt_no_repo(task_dir: Path) -> str:
+    task_text = read_task_text(task_dir)
+    buggy_code = (task_dir / "buggy_code.py").read_text()
+    group = repo_group(task_dir)
+
+    return (
+        "Fix the Python function below.\n"
+        "Keep the fix small and do not rewrite unrelated code.\n\n"
+        "Output format:\n"
+        "- Bug summary\n"
+        "- Fixed code\n\n"
         "Task-specific section:\n"
         f"Task ID: {task_dir.name}\n"
         f"Repository group: {group}\n"
@@ -148,6 +172,9 @@ def build_prompt(task_dir: Path, prompt_mode: str) -> str:
 
     if prompt_mode == "cache_aware":
         return build_cache_prompt(task_dir)
+
+    if prompt_mode == "cache_no_repo":
+        return build_cache_prompt_no_repo(task_dir)
 
     raise ValueError(f"Unknown prompt mode: {prompt_mode}")
 
@@ -185,6 +212,7 @@ def run_one_experiment(
         code_path = task_dir / "buggy_code.py"
         task_text = read_task_text(task_dir)
         before_code = code_path.read_text()
+        meta = read_task_meta(task_dir)
 
         prompt = build_prompt(task_dir, prompt_mode)
         prompt_tokens = count_tokens(prompt)
@@ -209,9 +237,9 @@ def run_one_experiment(
             {
                 "experiment": experiment_name,
                 "task_id": task_dir.name,
-                "repo_group": repo_group(task_dir),
-                "bug_type": read_task_meta(task_dir).get("bug_type", "unknown"),
-                "difficulty": read_task_meta(task_dir).get("difficulty", "unknown"),
+                "repo_group": meta.get("repo_group", "misc_utils"),
+                "bug_type": meta.get("bug_type", "unknown"),
+                "difficulty": meta.get("difficulty", "unknown"),
                 "position": position,
                 "prompt_mode": prompt_mode,
                 "order_mode": order_mode,

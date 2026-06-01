@@ -6,8 +6,9 @@ This is a quick summary from the latest local run.
 
 | run | recent reuse | best reuse | pass rate | avg prompt tokens |
 |---|---:|---:|---:|---:|
-| cache_grouped | 0.419 | 0.419 | 100.0% | 115.5 |
-| cache_original | 0.282 | 0.410 | 100.0% | 115.5 |
+| cache_grouped | 0.402 | 0.402 | 100.0% | 113.5 |
+| cache_no_repo_grouped | 0.373 | 0.373 | 100.0% | 88.5 |
+| cache_original | 0.260 | 0.394 | 100.0% | 113.5 |
 | normal_original | 0.015 | 0.015 | 100.0% | 184.7 |
 
 ## Backend comparison
