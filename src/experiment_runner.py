@@ -1,11 +1,12 @@
 import csv
 import shutil
+import subprocess
 import time
 from pathlib import Path
 
 from src.agent_backend import RuleFixer, read_task_text
 from src.metrics import cacheability_score, count_tokens
-from src.prompts import build_cache_aware_prompt, build_normal_prompt
+from src.prompts import build_normal_prompt
 from src.workspace import SOURCE_TASKS_DIR
 
 
@@ -19,6 +20,51 @@ def get_task_dirs() -> list[Path]:
         for path in SOURCE_TASKS_DIR.iterdir()
         if path.is_dir() and path.name.startswith(("task_", "tsk_"))
     )
+
+
+def task_number(task_id: str) -> int:
+    return int(task_id.split("_")[-1])
+
+
+def repo_group(task_id: str) -> str:
+    number = task_number(task_id)
+
+    if number in {1, 2}:
+        return "math_utils"
+
+    if number in {3, 4}:
+        return "string_utils"
+
+    if number in {5, 6}:
+        return "list_utils"
+
+    return "misc_utils"
+
+
+def repo_context(group: str) -> str:
+    contexts = {
+        "math_utils": (
+            "Repository context:\n"
+            "This repo contains small math utility functions. Most bugs are edge-case "
+            "or off-by-one errors in numeric helper functions.\n"
+        ),
+        "string_utils": (
+            "Repository context:\n"
+            "This repo contains small string processing helpers. Most bugs involve "
+            "normalization, whitespace, casing, or simple parsing behavior.\n"
+        ),
+        "list_utils": (
+            "Repository context:\n"
+            "This repo contains list and collection helpers. Most bugs involve empty "
+            "inputs, negative values, or simple aggregation logic.\n"
+        ),
+        "misc_utils": (
+            "Repository context:\n"
+            "This repo contains small Python utility functions with deterministic tests.\n"
+        ),
+    }
+
+    return contexts.get(group, contexts["misc_utils"])
 
 
 def make_run_workspace(experiment_name: str) -> Path:
@@ -37,21 +83,53 @@ def make_run_workspace(experiment_name: str) -> Path:
 
 def order_tasks(task_dirs: list[Path], order_mode: str) -> list[Path]:
     if order_mode == "original":
-        return task_dirs
+        # Intentionally mixed so grouped ordering has something real to change.
+        preferred_order = [1, 3, 5, 2, 4, 6]
+        rank = {task_num: i for i, task_num in enumerate(preferred_order)}
+
+        return sorted(
+            task_dirs,
+            key=lambda path: rank.get(task_number(path.name), 999),
+        )
 
     if order_mode == "grouped":
-        return sorted(task_dirs, key=lambda path: path.name)
+        return sorted(
+            task_dirs,
+            key=lambda path: (repo_group(path.name), task_number(path.name)),
+        )
 
     raise ValueError(f"Unknown order mode: {order_mode}")
+
+
+def build_cache_prompt(task_dir: Path) -> str:
+    task_text = read_task_text(task_dir)
+    buggy_code = (task_dir / "buggy_code.py").read_text()
+    group = repo_group(task_dir.name)
+
+    return (
+        "You are a careful coding agent.\n"
+        "Fix the smallest possible bug while keeping the original function simple.\n\n"
+        "Output format:\n"
+        "- Bug summary\n"
+        "- Fixed code\n\n"
+        f"{repo_context(group)}\n"
+        "Task-specific section:\n"
+        f"Task ID: {task_dir.name}\n"
+        f"Repository group: {group}\n"
+        "Language: python\n\n"
+        f"Problem:\n{task_text}\n\n"
+        f"Buggy code:\n{buggy_code}\n"
+    )
 
 
 def build_prompt(task_dir: Path, prompt_mode: str) -> str:
     task_text = read_task_text(task_dir)
     buggy_code = (task_dir / "buggy_code.py").read_text()
+    group = repo_group(task_dir.name)
 
     task = {
         "task_id": task_dir.name,
-        "repo": "toy_repair_benchmark",
+        "repo": group,
         "language": "python",
         "description": task_text,
         "buggy_code": buggy_code,
@@ -61,14 +139,12 @@ def build_prompt(task_dir: Path, prompt_mode: str) -> str:
         return build_normal_prompt(task)
 
     if prompt_mode == "cache_aware":
-        return build_cache_aware_prompt(task)
+        return build_cache_prompt(task_dir)
 
     raise ValueError(f"Unknown prompt mode: {prompt_mode}")
 
 
 def run_pytest(task_dir: Path) -> bool:
-    import subprocess
-
     result = subprocess.run(
         ["pytest", "-q"],
         cwd=task_dir,
@@ -104,7 +180,9 @@ def run_one_experiment(
 
         prompt = build_prompt(task_dir, prompt_mode)
         prompt_tokens = count_tokens(prompt)
-        prefix_reuse = cacheability_score(prompt, previous_prompts)
+
+        best_prefix_reuse = cacheability_score(prompt, previous_prompts)
+        recent_prefix_reuse = cacheability_score(prompt, previous_prompts[-1:])
 
         before_passed = run_pytest(task_dir)
 
@@ -123,6 +201,7 @@ def run_one_experiment(
             {
                 "experiment": experiment_name,
                 "task_id": task_dir.name,
+                "repo_group": repo_group(task_dir.name),
                 "position": position,
                 "prompt_mode": prompt_mode,
                 "order_mode": order_mode,
@@ -130,7 +209,8 @@ def run_one_experiment(
                 "before_passed": before_passed,
                 "after_passed": after_passed,
                 "prompt_tokens": prompt_tokens,
-                "prefix_reuse": prefix_reuse,
+                "best_prefix_reuse": best_prefix_reuse,
+                "recent_prefix_reuse": recent_prefix_reuse,
                 "fix_call_ms": round(fix_time * 1000, 4),
                 "output_chars": len(fixed_code),
             }

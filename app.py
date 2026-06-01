@@ -211,7 +211,8 @@ if experiment_results_path.exists():
     exp_summary = (
         exp_df.groupby("experiment")
         .agg(
-            avg_prefix_reuse=("prefix_reuse", "mean"),
+            avg_best_prefix_reuse=("best_prefix_reuse", "mean"),
+            avg_recent_prefix_reuse=("recent_prefix_reuse", "mean"),
             pass_rate=("after_passed", "mean"),
             avg_prompt_tokens=("prompt_tokens", "mean"),
             avg_fix_call_ms=("fix_call_ms", "mean"),
@@ -222,33 +223,36 @@ if experiment_results_path.exists():
     label_map = {
         "normal_original": "normal prompt",
         "cache_original": "cache-aware prompt",
-        "cache_grouped": "cache-aware grouped",
+        "cache_grouped": "grouped cache-aware",
     }
 
     exp_summary["run"] = exp_summary["experiment"].map(label_map)
 
+    normal_recent = exp_summary.loc[
+        exp_summary["experiment"] == "normal_original", "avg_recent_prefix_reuse"
+    ].iloc[0]
+
+    cache_recent = exp_summary.loc[
+        exp_summary["experiment"] == "cache_original", "avg_recent_prefix_reuse"
+    ].iloc[0]
+
+    grouped_recent = exp_summary.loc[
+        exp_summary["experiment"] == "cache_grouped", "avg_recent_prefix_reuse"
+    ].iloc[0]
+
     c1, c2, c3 = st.columns(3)
-    c1.metric(
-        "Normal avg prefix reuse",
-        f"{exp_summary.loc[exp_summary['experiment'] == 'normal_original', 'avg_prefix_reuse'].iloc[0]:.3f}",
-    )
-    c2.metric(
-        "Cache-aware avg prefix reuse",
-        f"{exp_summary.loc[exp_summary['experiment'] == 'cache_original', 'avg_prefix_reuse'].iloc[0]:.3f}",
-    )
-    c3.metric(
-        "Repair pass rate",
-        f"{exp_summary['pass_rate'].mean():.0%}",
-    )
+    c1.metric("Normal recent reuse", f"{normal_recent:.3f}")
+    c2.metric("Cache-aware recent reuse", f"{cache_recent:.3f}")
+    c3.metric("Grouped recent reuse", f"{grouped_recent:.3f}")
 
     fig_exp = px.bar(
         exp_summary,
-        x="avg_prefix_reuse",
+        x="avg_recent_prefix_reuse",
         y="run",
         orientation="h",
-        text=exp_summary["avg_prefix_reuse"].round(3),
-        labels={"avg_prefix_reuse": "average prefix reuse", "run": ""},
-        title="Cache-aware prompt layout creates much more shared prefix",
+        text=exp_summary["avg_recent_prefix_reuse"].round(3),
+        labels={"avg_recent_prefix_reuse": "average recent prefix reuse", "run": ""},
+        title="Grouping similar tasks improves adjacent prompt reuse",
     )
     fig_exp.update_traces(textposition="outside")
     fig_exp.update_layout(
@@ -260,19 +264,29 @@ if experiment_results_path.exists():
     st.plotly_chart(fig_exp, use_container_width=True)
 
     st.caption(
-        "This experiment compares normal prompting against a cache-aware layout. The current backend is still the rule baseline, so the useful signal here is prefix structure and whether repair success stays unchanged."
+        "Recent prefix reuse measures overlap with the immediately previous prompt. This makes task ordering matter: grouped cache-aware runs place similar tasks next to each other, so adjacent prompts share more structure."
     )
 
     st.dataframe(
         exp_summary.rename(
             columns={
                 "run": "Run",
-                "avg_prefix_reuse": "Avg prefix reuse",
+                "avg_best_prefix_reuse": "Best prefix reuse",
+                "avg_recent_prefix_reuse": "Recent prefix reuse",
                 "pass_rate": "Pass rate",
                 "avg_prompt_tokens": "Avg prompt tokens",
                 "avg_fix_call_ms": "Avg fix call time, ms",
             }
-        )[["Run", "Avg prefix reuse", "Pass rate", "Avg prompt tokens", "Avg fix call time, ms"]],
+        )[
+            [
+                "Run",
+                "Best prefix reuse",
+                "Recent prefix reuse",
+                "Pass rate",
+                "Avg prompt tokens",
+                "Avg fix call time, ms",
+            ]
+        ],
         use_container_width=True,
         hide_index=True,
     )
