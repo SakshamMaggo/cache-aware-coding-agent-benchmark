@@ -121,6 +121,10 @@ The `examples/` folder contains a few sample outputs from the current prototype:
 
 The actual `results/` folder is ignored by git because it gets regenerated every time the benchmark is run locally.
 
+For a short summary of the latest local run, see:
+
+    docs/latest_run.md
+
 ## Metrics shown
 
 Current metrics include:
