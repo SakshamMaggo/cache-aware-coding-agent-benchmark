@@ -59,7 +59,9 @@ The sample files are saved separately under `examples/`:
 
 I am still treating the rule baseline as the default reproducible run because GitHub Actions should not depend on a private API key.
 
-I also ran a small model-based prompt-layout experiment with `--fixer model --max-tasks 2`.
+I also ran a full model-based prompt-layout experiment on all 8 current tasks using:
+
+    python -m src.experiment_runner --fixer model --max-tasks 8
 
 This produced a real model-backed experiment CSV with four prompt settings:
 
@@ -72,7 +74,9 @@ The sample file is saved as:
 
 - `examples/sample_model_experiment_results.csv`
 
-This is still a small sample, but it confirms that the prompt-layout experiment can run through the same model-server backend, not only through the rule baseline.
+In this run, all four prompt settings kept the model pass rate at 8/8 on the current task set. The main difference was prefix reuse: normal prompting had very low recent prefix reuse, while the cache-aware and grouped settings had much higher recent prefix reuse.
+
+This is still a small benchmark, but it confirms that the prompt-layout experiment can run through the model-server backend, not only through the rule baseline.
 
 ## Next result to aim for
 
