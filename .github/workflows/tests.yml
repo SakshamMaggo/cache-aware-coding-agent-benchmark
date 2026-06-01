@@ -22,6 +22,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: check model backend config
+        run: python -m src.check_model_backend
+
       - name: run task evaluator
         run: python -m src.test_runner
 
@@ -39,3 +42,6 @@ jobs:
 
       - name: make latest run report
         run: python -m src.make_report
+
+      - name: run full local pipeline
+        run: python -m src.run_all
