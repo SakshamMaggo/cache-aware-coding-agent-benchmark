@@ -1,0 +1,7 @@
+task_id,fixer,attempt,passed,tests_passed,tests_failed,model,model_latency_seconds,prompt_chars,output_chars
+task_001,rule_baseline,1,True,3,0,rule_based,2.42e-06,110,40
+task_002,rule_baseline,1,True,3,0,rule_based,1.87e-06,179,101
+task_003,rule_baseline,1,True,3,0,rule_based,1.87e-06,114,79
+task_004,rule_baseline,1,True,3,0,rule_based,2.92e-06,137,52
+task_005,rule_baseline,1,True,3,0,rule_based,2.71e-06,196,128
+task_006,rule_baseline,1,True,3,0,rule_based,2.71e-06,134,86
