@@ -1,4 +1,5 @@
 import csv
+import json
 import shutil
 import subprocess
 import time
@@ -10,8 +11,16 @@ from src.prompts import build_normal_prompt
 from src.workspace import SOURCE_TASKS_DIR
 
 
+CONFIG_PATH = Path("configs/experiments.json")
 OUTPUT_PATH = Path("results/experiment_results.csv")
 RUNS_DIR = Path("runs/experiments")
+
+
+def load_experiments() -> list[dict]:
+    with open(CONFIG_PATH, "r") as f:
+        config = json.load(f)
+
+    return config["experiments"]
 
 
 def get_task_dirs() -> list[Path]:
@@ -83,9 +92,8 @@ def make_run_workspace(experiment_name: str) -> Path:
 
 def order_tasks(task_dirs: list[Path], order_mode: str) -> list[Path]:
     if order_mode == "original":
-        # Intentionally mixed so grouped ordering has something real to change.
-        preferred_order = [1, 3, 5, 2, 4, 6]
-        rank = {task_num: i for i, task_num in enumerate(preferred_order)}
+        mixed_order = [1, 3, 5, 2, 4, 6]
+        rank = {task_num: i for i, task_num in enumerate(mixed_order)}
 
         return sorted(
             task_dirs,
@@ -224,29 +232,18 @@ def run_one_experiment(
 def main() -> None:
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    experiments = [
-        {
-            "experiment_name": "normal_original",
-            "prompt_mode": "normal",
-            "order_mode": "original",
-        },
-        {
-            "experiment_name": "cache_original",
-            "prompt_mode": "cache_aware",
-            "order_mode": "original",
-        },
-        {
-            "experiment_name": "cache_grouped",
-            "prompt_mode": "cache_aware",
-            "order_mode": "grouped",
-        },
-    ]
-
     all_rows = []
 
-    for experiment in experiments:
-        print(f"Running {experiment['experiment_name']}...")
-        rows = run_one_experiment(**experiment)
+    for experiment in load_experiments():
+        experiment_name = experiment["name"]
+
+        print(f"Running {experiment_name}...")
+
+        rows = run_one_experiment(
+            experiment_name=experiment_name,
+            prompt_mode=experiment["prompt_mode"],
+            order_mode=experiment["order_mode"],
+        )
         all_rows.extend(rows)
 
     with open(OUTPUT_PATH, "w", newline="") as f:

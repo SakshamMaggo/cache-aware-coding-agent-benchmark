@@ -1,0 +1,19 @@
+{
+  "experiments": [
+    {
+      "name": "normal_original",
+      "prompt_mode": "normal",
+      "order_mode": "original"
+    },
+    {
+      "name": "cache_original",
+      "prompt_mode": "cache_aware",
+      "order_mode": "original"
+    },
+    {
+      "name": "cache_grouped",
+      "prompt_mode": "cache_aware",
+      "order_mode": "grouped"
+    }
+  ]
+}
