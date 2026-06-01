@@ -1,5 +1,7 @@
 # Cache-Aware Coding Agent Benchmark
 
+![benchmark checks](https://github.com/SakshamMaggo/cache-aware-coding-agent-benchmark/actions/workflows/tests.yml/badge.svg)
+
 This is an early benchmark project around coding-agent inference.
 
 The basic idea is that coding agents usually send a lot of repeated text across calls: system instructions, output rules, repo context, tool format, and task setup. If the repeated part of the prompt is kept at the front, the workload should be more friendly to prefix caching / KV-cache reuse.
