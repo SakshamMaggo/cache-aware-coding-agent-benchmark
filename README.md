@@ -79,6 +79,12 @@ Run the repair pipeline with the rule-based baseline:
 
 The runner also has a `--fixer model` option for future model-server experiments.
 
+Run the prompt-layout experiment:
+
+    python -m src.experiment_runner
+
+This compares normal prompting, cache-aware prompting, and grouped cache-aware prompting on the same repair task set.
+
 Start the dashboard:
 
     streamlit run app.py
@@ -86,6 +92,16 @@ Start the dashboard:
 Then open:
 
     http://localhost:8501
+
+## Prompt-layout experiment
+
+The experiment runner compares three settings:
+
+- normal prompt layout;
+- cache-aware prompt layout;
+- cache-aware prompt layout with grouped task order.
+
+The early result is simple but useful: cache-aware prompts create much higher prefix reuse while keeping the repair pass rate unchanged under the rule-based baseline. This does not prove real serving speedups yet, but it gives the project a clear systems question to test later with model-server, vLLM, or SGLang backends.
 
 ## Sample outputs
 
