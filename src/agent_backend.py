@@ -14,7 +14,18 @@ class BaseFixer:
     def fix(self, task_id: str, task_text: str, buggy_code: str) -> str:
         raise NotImplementedError("fix() is not implemented for this fixer")
 
+class NoFixer(BaseFixer):
+    name = "no_fix"
 
+    def fix(self, task_id: str, task_text: str, buggy_code: str) -> str:
+        self.last_call = {
+            "model": "none",
+            "latency_seconds": 0,
+            "prompt_chars": len(task_text) + len(buggy_code),
+            "output_chars": len(buggy_code),
+        }
+        return buggy_code
+    
 class RuleFixer(BaseFixer):
     """
     Small baseline fixer for the toy tasks.

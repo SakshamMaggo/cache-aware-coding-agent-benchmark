@@ -6,7 +6,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from src.agent_backend import ModelServerFixer, RuleFixer, read_task_text
+from src.agent_backend import ModelServerFixer, NoFixer, RuleFixer, read_task_text
 from src.workspace import reset_run_workspace
 
 
@@ -52,6 +52,9 @@ def run_pytest(task_dir: Path) -> dict:
 
 
 def pick_fixer(name: str):
+    if name == "none":
+        return NoFixer()
+
     if name == "rule":
         return RuleFixer()
 
@@ -139,7 +142,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--fixer",
-        choices=["rule", "model"],
+        choices=["none", "rule", "model"],
         default="rule",
         help="which fixer backend to use",
     )
