@@ -214,7 +214,7 @@ if experiment_results_path.exists():
             avg_prefix_reuse=("prefix_reuse", "mean"),
             pass_rate=("after_passed", "mean"),
             avg_prompt_tokens=("prompt_tokens", "mean"),
-            avg_fix_call_seconds=("fix_call_seconds", "mean"),
+            avg_fix_call_ms=("fix_call_ms", "mean"),
         )
         .reset_index()
     )
@@ -270,9 +270,9 @@ if experiment_results_path.exists():
                 "avg_prefix_reuse": "Avg prefix reuse",
                 "pass_rate": "Pass rate",
                 "avg_prompt_tokens": "Avg prompt tokens",
-                "avg_fix_call_seconds": "Avg fix call time",
+                "avg_fix_call_ms": "Avg fix call time, ms",
             }
-        )[["Run", "Avg prefix reuse", "Pass rate", "Avg prompt tokens", "Avg fix call time"]],
+        )[["Run", "Avg prefix reuse", "Pass rate", "Avg prompt tokens", "Avg fix call time, ms"]],
         use_container_width=True,
         hide_index=True,
     )

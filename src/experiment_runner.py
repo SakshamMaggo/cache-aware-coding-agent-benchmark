@@ -131,7 +131,7 @@ def run_one_experiment(
                 "after_passed": after_passed,
                 "prompt_tokens": prompt_tokens,
                 "prefix_reuse": prefix_reuse,
-                "fix_call_seconds": round(fix_time, 5),
+                "fix_call_ms": round(fix_time * 1000, 4),
                 "output_chars": len(fixed_code),
             }
         )
