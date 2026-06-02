@@ -8,6 +8,14 @@ The basic idea is that coding agents usually send a lot of repeated text across 
 
 Right now, this repo is not trying to claim a final serving result. It is a working prototype for testing the benchmark pipeline, prompt layouts, task ordering, repair traces, and model-backed sample runs.
 
+## Prototype status
+
+This repo is currently a presentable v1 prototype.
+
+It has a CI-safe rule-baseline pipeline, a 12-task benchmark set, saved hosted-model samples, a Streamlit dashboard, task metadata, current results, and methodology notes.
+
+The next major systems step is to connect the same experiment interface to a local OpenAI-compatible backend such as vLLM or SGLang and measure real serving metrics.
+
 ## Current status
 
 The current repo has 12 small repair tasks.
