@@ -1,6 +1,6 @@
 # Cache-Aware Coding Agent Benchmark
 
-benchmark checks
+[![benchmark checks](https://github.com/SakshamMaggo/cache-aware-coding-agent-benchmark/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/SakshamMaggo/cache-aware-coding-agent-benchmark/actions/workflows/tests.yml)
 
 This is an early benchmark project around coding-agent inference.
 
