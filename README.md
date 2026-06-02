@@ -145,6 +145,10 @@ For the current task inventory, see:
 
 This lists each benchmark task with its repo group, bug type, difficulty, and short description.
 
+For the methodology and current measurement limits, see:
+
+    docs/methodology.md
+
 ## Metrics shown
 
 Current metrics include:
