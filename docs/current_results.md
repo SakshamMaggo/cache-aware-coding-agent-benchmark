@@ -65,13 +65,11 @@ I am still treating the rule baseline as the default reproducible run because Gi
 
 ## Model prompt experiment sample
 
-The latest saved model prompt-layout experiment is still from the 10-task version of the benchmark.
+I also ran a full model-based prompt-layout experiment on all 12 current tasks using:
 
-That sample was run with:
+    python -m src.experiment_runner --fixer model --max-tasks 12
 
-    python -m src.experiment_runner --fixer model --max-tasks 10
-
-It produced a real model-backed experiment CSV with four prompt settings:
+This produced a real model-backed experiment CSV with four prompt settings:
 
 - normal prompt layout
 - cache-aware prompt layout
@@ -82,9 +80,9 @@ The sample file is saved as:
 
 - examples/sample_model_experiment_results.csv
 
-In that 10-task run, all four prompt settings solved 10/10 tasks. The main difference was prefix reuse: normal prompting had very low recent prefix reuse, while cache-aware and grouped layouts had much higher recent prefix reuse.
+In this run, all four prompt settings solved 11/12 tasks. The main difference was prefix reuse: normal prompting had very low recent prefix reuse, while cache-aware and grouped layouts had much higher recent prefix reuse.
 
-The next update should rerun this model prompt experiment on the current 12-task set.
+This is still a small benchmark, but it confirms that the prompt-layout experiment can run through the model-server backend, not only through the rule baseline.
 
 ## Current limitations
 
