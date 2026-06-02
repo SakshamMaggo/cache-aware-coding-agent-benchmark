@@ -1,6 +1,6 @@
 # Current Results
 
-This is a short note on the current 10-task run.
+This is a short note on the current 12-task run.
 
 The benchmark currently compares four prompt-layout settings:
 
@@ -9,7 +9,7 @@ The benchmark currently compares four prompt-layout settings:
 3. cache-aware prompt layout with grouped task order
 4. cache-aware prompt layout without repo context, using grouped task order
 
-The default local run still uses the rule-based baseline. So the default CI-safe result is mainly useful for checking the benchmark pipeline, prompt structure, task ordering, traces, and reports. It should not be read as a real model-quality result.
+The default local run still uses the rule-based baseline. So the default CI-safe result is mainly useful for checking the benchmark pipeline, prompt structure, task ordering, traces, reports, and dashboard. It should not be read as a real model-quality result.
 
 ## Main observation
 
@@ -34,22 +34,23 @@ This does not prove a serving-system speedup by itself. It shows that the worklo
 
 ## Repair quality
 
-The default rule baseline currently fixes 6/10 tasks.
+The default rule baseline currently fixes 6/12 tasks.
 
 This is a better signal than the earlier toy-only run because the newer medium tasks are not all solved by simple rules. The rule baseline is still useful as a cheap reproducible check, but it is no longer pretending to solve the full benchmark.
 
-The no-fix baseline fixes 0/10 tasks.
+The no-fix baseline fixes 0/12 tasks.
 
 ## Model backend sample
 
-I also ran the model-server backend on the current 10-task set using a hosted model endpoint.
+I also ran the model-server backend on the current 12-task set using a hosted model endpoint.
 
 This confirms that the --fixer model path is wired up and can produce real repair outputs.
 
 In the saved model repair sample:
 
-- all 10 tasks were attempted with model_server
-- the model fixed 10/10 tasks
+- all 12 tasks were attempted with model_server
+- the model fixed 11/12 tasks
+- the failed task is a prompt-block deduplication task that requires normalizing whitespace/casing for comparison while preserving the first readable block
 - real model latency was logged
 - prompt size and output size were saved
 - attempt-level traces were written
@@ -64,11 +65,13 @@ I am still treating the rule baseline as the default reproducible run because Gi
 
 ## Model prompt experiment sample
 
-I also ran a full model-based prompt-layout experiment on all 10 current tasks using:
+The latest saved model prompt-layout experiment is still from the 10-task version of the benchmark.
+
+That sample was run with:
 
     python -m src.experiment_runner --fixer model --max-tasks 10
 
-This produced a real model-backed experiment CSV with four prompt settings:
+It produced a real model-backed experiment CSV with four prompt settings:
 
 - normal prompt layout
 - cache-aware prompt layout
@@ -79,9 +82,9 @@ The sample file is saved as:
 
 - examples/sample_model_experiment_results.csv
 
-In this run, all four prompt settings solved 10/10 tasks. The main difference was prefix reuse: normal prompting had very low recent prefix reuse, while cache-aware and grouped layouts had much higher recent prefix reuse.
+In that 10-task run, all four prompt settings solved 10/10 tasks. The main difference was prefix reuse: normal prompting had very low recent prefix reuse, while cache-aware and grouped layouts had much higher recent prefix reuse.
 
-This is still a small benchmark, but it confirms that the prompt-layout experiment can run through the model-server backend, not only through the rule baseline.
+The next update should rerun this model prompt experiment on the current 12-task set.
 
 ## Current limitations
 
