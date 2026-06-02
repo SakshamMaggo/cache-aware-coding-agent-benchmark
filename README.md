@@ -16,6 +16,12 @@ It has a CI-safe rule-baseline pipeline, a 12-task benchmark set, saved hosted-m
 
 The next major systems step is to connect the same experiment interface to a local OpenAI-compatible backend such as vLLM or SGLang and measure real serving metrics.
 
+## Dashboard preview
+
+The dashboard summarizes the CI-safe rule baseline, saved model-backed experiment samples, prefix reuse, backend comparison, and attempt-level repair traces.
+
+![Dashboard preview](assets/dashboard_preview.png)
+
 ## Current status
 
 The current repo has 12 small repair tasks.
