@@ -226,7 +226,7 @@ The main comparison I want to run later is the tradeoff between repair quality a
 ## Next steps
 
 - Connect the same model-server interface to a local OpenAI-compatible backend such as vLLM or SGLang.
-- Measure real serving metrics such as TTFT, total latency, throughput, and prefix-cache behavior.
-- Add more realistic code-repair tasks once the serving side is better instrumented.
-- Compare normal prompting, cache-aware prompting, and grouped scheduling under the same model backend.
-- Track pass rate, retries, latency, prompt size, output size, and serving metrics together.
+- Measure real serving metrics such as TTFT, total latency, throughput, tokens per second, and prefix-cache behavior.
+- Test whether higher prefix reuse from cache-aware prompting actually improves serving-side performance.
+- Expand the task set with more realistic multi-file and repo-level repair tasks.
+- Run repeated model-backed experiments to check whether the pass-rate and latency patterns are stable.
