@@ -28,10 +28,10 @@ This is a quick summary from the latest local run.
 
 | run | tasks | pass rate | recent reuse | avg model call time |
 |---|---:|---:|---:|---:|
-| cache_grouped | 10 | 60.0% | 0.335 | 0.00s |
-| cache_no_repo_grouped | 10 | 60.0% | 0.343 | 0.00s |
-| cache_original | 10 | 60.0% | 0.252 | 0.00s |
-| normal_original | 10 | 60.0% | 0.015 | 0.00s |
+| cache_grouped | 12 | 91.7% | 0.331 | 1.22s |
+| cache_no_repo_grouped | 12 | 91.7% | 0.332 | 2.12s |
+| cache_original | 12 | 91.7% | 0.273 | 1.23s |
+| normal_original | 12 | 91.7% | 0.015 | 2.46s |
 
 This sample is saved under `examples/sample_model_experiment_results.csv`. It is not run in CI because it needs a private API key.
 
