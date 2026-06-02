@@ -1,5 +1,6 @@
 {
   "repo_group": "cache_utils",
   "bug_type": "cache_key_normalization",
-  "difficulty": "medium"
+  "difficulty": "medium",
+  "systems_relevance": "cache_behavior_task"
 }

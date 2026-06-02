@@ -1,5 +1,6 @@
 {
   "repo_group": "string_utils",
   "bug_type": "whitespace_handling",
-  "difficulty": "easy"
+  "difficulty": "easy",
+  "systems_relevance": "generic_repair_task"
 }

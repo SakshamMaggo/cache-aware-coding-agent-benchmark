@@ -1,5 +1,6 @@
 {
   "repo_group": "math_utils",
   "bug_type": "loop_boundary",
-  "difficulty": "easy"
+  "difficulty": "easy",
+  "systems_relevance": "generic_repair_task"
 }

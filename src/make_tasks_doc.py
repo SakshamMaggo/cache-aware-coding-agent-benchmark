@@ -45,8 +45,8 @@ def main() -> None:
         "",
         "This file summarizes the current benchmark tasks.",
         "",
-        "| task | group | bug type | difficulty | short description |",
-        "|---|---|---|---|---|",
+        "| task | group | bug type | difficulty | systems relevance | short description |",
+        "|---|---|---|---|---|---|",
     ]
 
     for task_dir in task_dirs:
@@ -59,6 +59,7 @@ def main() -> None:
             f"{meta.get('repo_group', 'unknown')} | "
             f"{meta.get('bug_type', 'unknown')} | "
             f"{meta.get('difficulty', 'unknown')} | "
+            f"{meta.get('systems_relevance', 'unknown')} | "
             f"{summary} |"
         )
 

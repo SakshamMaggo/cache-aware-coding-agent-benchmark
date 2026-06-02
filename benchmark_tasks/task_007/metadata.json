@@ -1,5 +1,6 @@
 {
   "repo_group": "file_utils",
   "bug_type": "extension_handling",
-  "difficulty": "medium"
+  "difficulty": "medium",
+  "systems_relevance": "benchmark_io_task"
 }

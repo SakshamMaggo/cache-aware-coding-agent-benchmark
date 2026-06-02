@@ -1,5 +1,6 @@
 {
   "repo_group": "list_utils",
   "bug_type": "bad_initial_value",
-  "difficulty": "easy"
+  "difficulty": "easy",
+  "systems_relevance": "generic_repair_task"
 }

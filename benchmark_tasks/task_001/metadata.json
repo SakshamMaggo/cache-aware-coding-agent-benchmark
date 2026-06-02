@@ -1,5 +1,6 @@
 {
   "repo_group": "math_utils",
   "bug_type": "wrong_operator",
-  "difficulty": "easy"
+  "difficulty": "easy",
+  "systems_relevance": "generic_repair_task"
 }
