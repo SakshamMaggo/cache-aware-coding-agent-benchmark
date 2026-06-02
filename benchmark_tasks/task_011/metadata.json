@@ -1,0 +1,6 @@
+{
+  "repo_group": "prompt_utils",
+  "bug_type": "prompt_block_deduplication",
+  "difficulty": "medium",
+  "systems_relevance": "prompt_layout_task"
+}

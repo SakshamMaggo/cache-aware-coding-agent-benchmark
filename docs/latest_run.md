@@ -6,22 +6,22 @@ This is a quick summary from the latest local run.
 
 | run | recent reuse | best reuse | pass rate | avg prompt tokens |
 |---|---:|---:|---:|---:|
-| cache_grouped | 0.335 | 0.345 | 60.0% | 133.5 |
-| cache_no_repo_grouped | 0.343 | 0.343 | 60.0% | 111.0 |
-| cache_original | 0.252 | 0.333 | 60.0% | 133.5 |
-| normal_original | 0.015 | 0.015 | 60.0% | 207.1 |
+| cache_grouped | 0.331 | 0.350 | 50.0% | 134.8 |
+| cache_no_repo_grouped | 0.332 | 0.332 | 50.0% | 113.8 |
+| cache_original | 0.273 | 0.340 | 50.0% | 134.8 |
+| normal_original | 0.015 | 0.015 | 50.0% | 209.8 |
 
 ## Backend comparison
 
 | backend | tasks | pass rate | avg attempts | failed tests after |
 |---|---:|---:|---:|---:|
-| none | 10 | 0.0% | 2.00 | 19 |
-| rule | 10 | 60.0% | 1.40 | 9 |
+| none | 12 | 0.0% | 2.00 | 22 |
+| rule | 12 | 50.0% | 1.50 | 12 |
 
 ## Repair run
 
-- fixed tasks: 6/10
-- attempt rows logged: 14
+- fixed tasks: 6/12
+- attempt rows logged: 18
 - max attempts used by any task: 2
 
 ## Model prompt experiment sample
@@ -38,10 +38,10 @@ This sample is saved under `examples/sample_model_experiment_results.csv`. It is
 ## Model sample run
 
 - model: gpt-4.1-mini
-- fixed tasks: 10/10
-- avg model call time: 1.85 seconds
-- avg prompt chars: 395.2
-- avg output chars: 179.0
+- fixed tasks: 11/12
+- avg model call time: 1.57 seconds
+- avg prompt chars: 412.9
+- avg output chars: 183.6
 
 This sample is saved under `examples/`. It is not run in CI because it needs a private API key.
 

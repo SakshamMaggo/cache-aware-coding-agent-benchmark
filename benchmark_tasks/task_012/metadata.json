@@ -1,0 +1,6 @@
+{
+  "repo_group": "scheduler_utils",
+  "bug_type": "stable_grouping",
+  "difficulty": "medium",
+  "systems_relevance": "task_scheduling_task"
+}
