@@ -1,0 +1,2 @@
+model,prompt_chars,time_to_first_chunk_seconds,total_latency_seconds,output_chars,chars_per_second_after_first_chunk
+gpt-4.1-mini,474,2.5921,3.1998,340,559.47
