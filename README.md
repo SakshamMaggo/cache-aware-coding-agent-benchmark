@@ -53,6 +53,7 @@ The model samples are saved under examples/, but they are not rerun in CI becaus
 - Saves before/after repair traces.
 - Saves attempt-level traces.
 - Generates reports under docs/.
+- Includes a streaming probe for TTFT-style latency measurement on OpenAI-compatible model backends.
 - Shows results in a Streamlit dashboard.
 
 The rule fixer is not meant to be a serious coding agent. It is there to keep the benchmark pipeline cheap, reproducible, and CI-safe.
@@ -184,6 +185,10 @@ For the current task inventory, see:
 
 This lists each benchmark task with its repo group, bug type, difficulty, systems relevance, and short description.
 
+For the streaming latency probe, see:
+
+    docs/streaming_probe.md
+    
 For the methodology and current measurement limits, see:
 
     docs/methodology.md
@@ -207,8 +212,11 @@ Current metrics include:
 - model/backend name
 - model call latency when the model backend is used
 - prompt/output character counts
+- time to first streamed chunk
+- total streamed latency
+- simple output speed estimate
 
-TTFT means time to first token. The current project does not yet measure real TTFT or throughput. The current prefix-reuse score is only a proxy for cache-friendliness. A stronger version should connect this proxy to real serving-side measurements.
+TTFT means time to first token. The project now has a small streaming probe that measures the time to the first streamed response from an OpenAI-compatible model backend. This is still an early measurement, not a full serving benchmark. A stronger version should test the same idea on local vLLM or SGLang backends and measure batching, throughput, and prefix-cache behavior more directly.
 
 ## Backend plan
 
