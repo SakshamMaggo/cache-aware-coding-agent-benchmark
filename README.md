@@ -1,6 +1,10 @@
 # Cache-Aware Coding Agent Benchmark
 
 [![benchmark checks](https://github.com/SakshamMaggo/cache-aware-coding-agent-benchmark/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/SakshamMaggo/cache-aware-coding-agent-benchmark/actions/workflows/tests.yml)
+![status](https://img.shields.io/badge/status-v1.1%20prototype-orange)
+![focus](https://img.shields.io/badge/focus-LLM%20agents%20%7C%20inference%20evals-purple)
+![backend](https://img.shields.io/badge/backend-OpenAI--compatible-blue)
+![dashboard](https://img.shields.io/badge/dashboard-Streamlit-red)
 
 This is an early benchmark project around coding-agent inference.
 
