@@ -241,14 +241,6 @@ The model-server path is intentionally provider-neutral. The goal is to compare 
 
 The main comparison I want to run later is the tradeoff between repair quality and serving efficiency: latency, prompt size, output size, retries, and eventually TTFT / throughput.
 
-## Next steps
-
-- Connect the same model-server interface to a local OpenAI-compatible backend such as vLLM or SGLang.
-- Measure real serving metrics such as TTFT, total latency, throughput, tokens per second, and prefix-cache behavior.
-- Test whether higher prefix reuse from cache-aware prompting actually improves serving-side performance.
-- Expand the task set with more realistic multi-file and repo-level repair tasks.
-- Run repeated model-backed experiments to check whether the pass-rate and latency patterns are stable.
-
 ## Local model backends
 
 The benchmark can run against hosted APIs as well as local OpenAI-compatible model servers such as vLLM and SGLang.
@@ -267,3 +259,11 @@ Example local run after starting a server:
 
     ./scripts/run_local_backend_experiment.sh vllm
     ./scripts/run_local_backend_experiment.sh sglang
+
+## Next steps
+
+- Run a real vLLM/SGLang experiment on a GPU instance and compare it with the hosted backend.
+- Measure real serving metrics such as TTFT, total latency, throughput, tokens per second, and prefix-cache behavior.
+- Test whether higher prefix reuse from cache-aware prompting actually improves serving-side performance.
+- Expand the task set with more realistic multi-file and repo-level repair tasks.
+- Run repeated model-backed experiments to check whether the pass-rate and latency patterns are stable.
