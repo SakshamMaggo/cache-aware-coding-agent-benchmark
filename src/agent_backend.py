@@ -1,9 +1,8 @@
-import os
 import time
-from src.env_loader import load_env
 from pathlib import Path
 
 from src.fixer import generate_rule_based_fix
+from src.model_client import OpenAICompatibleModelClient
 
 
 class BaseFixer:
@@ -64,28 +63,8 @@ class ModelServerFixer(BaseFixer):
 
     def __init__(self) -> None:
         super().__init__()
-        load_env()
-        try:
-            from openai import OpenAI
-        except ImportError as exc:
-            raise ImportError(
-                "ModelServerFixer needs the openai package. "
-                "Install requirements first."
-            ) from exc
-
-        self.model = os.getenv("MODEL_NAME", "local-code-model")
-        api_key = os.getenv("MODEL_API_KEY") or os.getenv("OPENAI_API_KEY")
-        base_url = os.getenv("MODEL_BASE_URL") or os.getenv("OPENAI_BASE_URL") or None
-
-        if not api_key:
-         raise ValueError(
-        "No model API key found. Set MODEL_API_KEY in your local .env file first."
-    )
-
-        self.client = OpenAI(
-    api_key=api_key,
-    base_url=base_url,
-)
+        self.client = OpenAICompatibleModelClient()
+        self.model = self.client.model
 
     def fix(self, task_id: str, task_text: str, buggy_code: str) -> str:
         prompt = (
@@ -96,23 +75,16 @@ class ModelServerFixer(BaseFixer):
             "Do not include markdown. Do not include explanation."
         )
 
-        start = time.perf_counter()
+        result = self.client.chat(prompt=prompt, temperature=0)
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0,
-        )
-
-        elapsed = time.perf_counter() - start
-
-        raw_code = response.choices[0].message.content or ""
-        fixed_code = strip_code_fence(raw_code)
+        fixed_code = strip_code_fence(result.text)
 
         self.last_call = {
-            "model": self.model,
-            "latency_seconds": round(elapsed, 8),
-            "prompt_chars": len(prompt),
+            "model": result.model,
+            "backend_type": result.backend_type,
+            "base_url": result.base_url,
+            "latency_seconds": result.latency_seconds,
+            "prompt_chars": result.prompt_chars,
             "output_chars": len(fixed_code),
         }
 
