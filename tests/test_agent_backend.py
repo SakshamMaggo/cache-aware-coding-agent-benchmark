@@ -27,3 +27,19 @@ def test_rule_fixer_fixes_known_task():
 
     assert "return a + b" in fixed
     assert fixer.last_call["model"] == "rule_based"
+
+def test_get_backend_type_detects_hosted_backend():
+    from src.model_client import get_backend_type
+
+    assert get_backend_type(None) == "hosted"
+
+
+def test_get_backend_type_detects_local_backend(monkeypatch):
+    from src.model_client import get_backend_type
+
+    monkeypatch.delenv("MODEL_BACKEND", raising=False)
+
+    assert (
+        get_backend_type("http://localhost:8000/v1")
+        == "local_openai_compatible"
+    )

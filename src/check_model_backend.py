@@ -1,48 +1,46 @@
-import os
-
-from src.env_loader import load_env
+from src.model_client import OpenAICompatibleModelClient
 
 
 def main() -> None:
-    load_env()
-
-    model_name = os.getenv("MODEL_NAME")
-    api_key = os.getenv("MODEL_API_KEY") or os.getenv("OPENAI_API_KEY")
-    base_url = os.getenv("MODEL_BASE_URL") or os.getenv("OPENAI_BASE_URL")
-
     print("Model backend check")
     print("-------------------")
 
-    if model_name:
-        print(f"MODEL_NAME: {model_name}")
-    else:
-        print("MODEL_NAME: not set")
-
-    if base_url:
-        print(f"MODEL_BASE_URL: {base_url}")
-    else:
-        print("MODEL_BASE_URL: not set")
-
-    if api_key:
-        print("MODEL_API_KEY: set")
-    else:
-        print("MODEL_API_KEY: not set")
-
-    if not api_key:
-        print("")
-        print("Model mode is not ready yet.")
-        print("Add MODEL_API_KEY to your local .env file before running --fixer model.")
+    try:
+        client = OpenAICompatibleModelClient()
+    except Exception as exc:
+        print("Model mode is not ready.")
+        print(f"Reason: {exc}")
         return
 
-    if api_key == "your_api_key_here":
-        print("")
-        print("Model mode is not ready yet.")
-        print("MODEL_API_KEY is still the placeholder value.")
-        return
+    print(f"MODEL_NAME: {client.model}")
+    print(f"MODEL_BASE_URL: {client.base_url or 'not set'}")
+    print(f"MODEL_BACKEND: {client.backend_type}")
+    print("MODEL_API_KEY: set")
 
     print("")
-    print("Model mode has the basic config needed to start.")
-    print("This script does not call the model server.")
+    print("Checking /v1/models...")
+    try:
+        models = client.list_models()
+        print(f"Server returned {len(models)} model(s).")
+        if models:
+            print(f"First model: {models[0]}")
+    except Exception as exc:
+        print("Could not list models.")
+        print(f"Reason: {exc}")
+
+    print("")
+    print("Sending a tiny chat request...")
+    try:
+        result = client.chat(
+            prompt="Return exactly this text: backend-ok",
+            temperature=0,
+        )
+        print("Chat request succeeded.")
+        print(f"Latency seconds: {result.latency_seconds}")
+        print(f"Output: {result.text.strip()}")
+    except Exception as exc:
+        print("Chat request failed.")
+        print(f"Reason: {exc}")
 
 
 if __name__ == "__main__":

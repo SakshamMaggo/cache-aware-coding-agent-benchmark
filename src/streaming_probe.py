@@ -1,11 +1,8 @@
 import csv
-import os
 import time
 from pathlib import Path
 
-from openai import OpenAI
-
-from src.env_loader import load_env
+from src.model_client import OpenAICompatibleModelClient
 
 
 OUTPUT_PATH = Path("results/streaming_probe.csv")
@@ -30,30 +27,16 @@ def build_probe_prompt() -> str:
     )
 
 
-def make_client() -> tuple[OpenAI, str]:
-    load_env()
-
-    model = os.getenv("MODEL_NAME", "local-code-model")
-    api_key = os.getenv("MODEL_API_KEY") or os.getenv("OPENAI_API_KEY")
-    base_url = os.getenv("MODEL_BASE_URL") or os.getenv("OPENAI_BASE_URL") or None
-
-    if not api_key:
-        raise ValueError("Set MODEL_API_KEY in your local .env file first.")
-
-    client = OpenAI(api_key=api_key, base_url=base_url)
-    return client, model
-
-
 def run_streaming_probe() -> dict:
-    client, model = make_client()
+    model_client = OpenAICompatibleModelClient()
     prompt = build_probe_prompt()
 
     start = time.perf_counter()
     first_chunk_time = None
     output_parts = []
 
-    stream = client.chat.completions.create(
-        model=model,
+    stream = model_client.client.chat.completions.create(
+        model=model_client.model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0,
         stream=True,
@@ -89,7 +72,9 @@ def run_streaming_probe() -> dict:
     chars_per_second = len(output) / generation_time
 
     return {
-        "model": model,
+        "model": model_client.model,
+        "backend_type": model_client.backend_type,
+        "base_url": model_client.base_url or "",
         "prompt_chars": len(prompt),
         "time_to_first_chunk_seconds": round(time_to_first_chunk, 4),
         "total_latency_seconds": round(total_latency, 4),
