@@ -248,3 +248,22 @@ The main comparison I want to run later is the tradeoff between repair quality a
 - Test whether higher prefix reuse from cache-aware prompting actually improves serving-side performance.
 - Expand the task set with more realistic multi-file and repo-level repair tasks.
 - Run repeated model-backed experiments to check whether the pass-rate and latency patterns are stable.
+
+## Local model backends
+
+The benchmark can run against hosted APIs as well as local OpenAI-compatible model servers such as vLLM and SGLang.
+
+Useful commands:
+
+    python -m src.check_model_backend
+    python -m src.streaming_probe
+    python -m src.repair_runner --fixer model --max-tasks 3
+
+For local backends, see:
+
+    docs/v1_2_local_backends.md
+
+Example local run after starting a server:
+
+    ./scripts/run_local_backend_experiment.sh vllm
+    ./scripts/run_local_backend_experiment.sh sglang
