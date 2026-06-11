@@ -18,7 +18,7 @@ This repo is currently a presentable v1 prototype.
 
 It has a CI-safe rule-baseline pipeline, a 12-task benchmark set, saved hosted-model samples, a Streamlit dashboard, task metadata, current results, and methodology notes.
 
-The next major systems step is to connect the same experiment interface to a local OpenAI-compatible backend such as vLLM or SGLang and measure real serving metrics.
+The repo now has a basic local-backend setup for vLLM and SGLang. I have tested the hosted model path, and the next step is to run the same benchmark on a GPU-backed local server and compare the results.
 
 ## Dashboard preview
 
@@ -262,8 +262,8 @@ Example local run after starting a server:
 
 ## Next steps
 
-- Run a real vLLM/SGLang experiment on a GPU instance and compare it with the hosted backend.
-- Measure real serving metrics such as TTFT, total latency, throughput, tokens per second, and prefix-cache behavior.
-- Test whether higher prefix reuse from cache-aware prompting actually improves serving-side performance.
-- Expand the task set with more realistic multi-file and repo-level repair tasks.
-- Run repeated model-backed experiments to check whether the pass-rate and latency patterns are stable.
+- Run the benchmark once with vLLM or SGLang on a GPU instance.
+- Compare the local backend results with the hosted model results.
+- Track TTFT, total latency, throughput, tokens per second, and prefix-cache behavior.
+- Add more realistic multi-file and repo-level repair tasks.
+- Run repeated model-backed experiments to check whether the pass-rate and latency numbers are stable.
