@@ -262,8 +262,8 @@ Example local run after starting a server:
 
 ## Next steps
 
-- Run the benchmark once with vLLM or SGLang on a GPU instance.
-- Compare the local backend results with the hosted model results.
-- Track TTFT, total latency, throughput, tokens per second, and prefix-cache behavior.
-- Add more realistic multi-file and repo-level repair tasks.
-- Run repeated model-backed experiments to check whether the pass-rate and latency numbers are stable.
+- Try the benchmark with vLLM or SGLang on a rented GPU.
+- Compare that run with the hosted model run.
+- Log basic serving numbers like TTFT, latency, tokens/sec, and prefix-cache behaviour.
+- Add a few harder tasks where the fix needs more than one file.
+- Run the same model a few times to see if the results are stable.
